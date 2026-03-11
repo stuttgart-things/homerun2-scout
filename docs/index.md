@@ -28,7 +28,7 @@ go run main.go
 | `/analytics/summary`   | GET    | Bearer   | Severity counts, total messages          |
 | `/analytics/systems`   | GET    | Bearer   | Per-system message counts, top N         |
 | `/analytics/alerts`    | GET    | Bearer   | Alert frequency, top alerting systems    |
-| `/metrics`             | GET    | No       | Prometheus metrics                       |
+| `/metrics`             | GET    | No       | Prometheus metrics (Grafana integration) |
 
 ## Authentication
 
@@ -71,6 +71,10 @@ curl http://localhost:8080/analytics/summary \
 | `ALERT_COOLDOWN` | `5m` | Minimum time between alerts |
 
 > When `SCOUT_PROFILE_NAME` is set, the corresponding `ScoutProfile` CR overrides these env var values at startup. See [ScoutProfile](scout-profile.md).
+
+## Grafana
+
+Scout exposes analytics as Prometheus metrics at `/metrics`. See [Grafana Integration](grafana.md) for the full metrics reference, PromQL examples, and sample dashboard panels.
 
 ## Prerequisites
 

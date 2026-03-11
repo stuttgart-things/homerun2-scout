@@ -137,12 +137,23 @@ func (a *Aggregator) runOnce(ctx context.Context) {
 	duration := time.Since(start).Seconds()
 	metrics.AggregationDuration.Observe(duration)
 
+	metrics.MessagesTotal.Set(float64(summary.TotalMessages))
 	for sev, count := range summary.SeverityCounts {
-		metrics.MessagesTotal.WithLabelValues(sev).Set(float64(count))
+		metrics.SeverityCount.WithLabelValues(sev).Set(float64(count))
 	}
+
 	metrics.SystemsTotal.Set(float64(systems.Total))
+	metrics.SystemMessageCount.Reset()
+	for _, sc := range systems.Systems {
+		metrics.SystemMessageCount.WithLabelValues(sc.System).Set(float64(sc.Count))
+	}
+
 	for sev, count := range alerts.SeverityCounts {
-		metrics.AlertsTotal.WithLabelValues(sev).Set(float64(count))
+		metrics.AlertCount.WithLabelValues(sev).Set(float64(count))
+	}
+	metrics.TopAlertingSystemCount.Reset()
+	for _, sc := range alerts.TopSystems {
+		metrics.TopAlertingSystemCount.WithLabelValues(sc.System).Set(float64(sc.Count))
 	}
 
 	// Invoke callback if set

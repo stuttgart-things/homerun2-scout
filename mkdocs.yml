@@ -6,6 +6,7 @@ nav:
   - API Usage: api-usage.md
   - Deployment: deployment.md
   - ScoutProfile: scout-profile.md
+  - Grafana: grafana.md
   - CI/CD: cicd.md
 
 plugins:
