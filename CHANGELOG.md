@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.2.1...v0.3.0) (2026-03-11)
+
+
+### Features
+
+* expose analytics as Prometheus metrics for Grafana integration ([86daf90](https://github.com/stuttgart-things/homerun2-scout/commit/86daf90807f66faed173891de6f3be9b3b758295)), closes [#23](https://github.com/stuttgart-things/homerun2-scout/issues/23)
+
 ## [0.2.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.2.0...v0.2.1) (2026-03-11)
 
 
