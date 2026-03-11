@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.1.0...v0.2.0) (2026-03-11)
+
+
+### Features
+
+* ScoutProfile CRD for business logic configuration ([444b037](https://github.com/stuttgart-things/homerun2-scout/commit/444b037ea870be59ca84bd68007a50980c2e4ca3)), closes [#19](https://github.com/stuttgart-things/homerun2-scout/issues/19)
+
 # [0.1.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.0.0...v0.1.0) (2026-03-11)
 
 
