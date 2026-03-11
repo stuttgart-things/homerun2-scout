@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/stuttgart-things/homerun2-scout/internal/metrics"
 	"github.com/stuttgart-things/homerun2-scout/internal/models"
 )
 
@@ -111,6 +112,7 @@ func (a *Aggregator) Alerts() *models.AlertStats {
 
 func (a *Aggregator) runOnce(ctx context.Context) {
 	slog.Debug("running aggregation cycle")
+	start := time.Now()
 
 	summary := a.aggregateSummary(ctx)
 	systems := a.aggregateSystems(ctx)
@@ -122,9 +124,22 @@ func (a *Aggregator) runOnce(ctx context.Context) {
 	a.alerts = alerts
 	a.mu.Unlock()
 
+	// Record Prometheus metrics
+	duration := time.Since(start).Seconds()
+	metrics.AggregationDuration.Observe(duration)
+
+	for sev, count := range summary.SeverityCounts {
+		metrics.MessagesTotal.WithLabelValues(sev).Set(float64(count))
+	}
+	metrics.SystemsTotal.Set(float64(systems.Total))
+	for sev, count := range alerts.SeverityCounts {
+		metrics.AlertsTotal.WithLabelValues(sev).Set(float64(count))
+	}
+
 	slog.Info("aggregation cycle complete",
 		"totalMessages", summary.TotalMessages,
 		"systemCount", systems.Total,
 		"totalAlerts", alerts.TotalAlerts,
+		"duration", duration,
 	)
 }

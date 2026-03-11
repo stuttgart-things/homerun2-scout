@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/redis/go-redis/v9"
 	"github.com/stuttgart-things/homerun2-scout/internal/aggregator"
 	"github.com/stuttgart-things/homerun2-scout/internal/banner"
@@ -73,6 +74,9 @@ func main() {
 	mux.HandleFunc("/analytics/summary", authWrap(handlers.NewSummaryHandler(agg)))
 	mux.HandleFunc("/analytics/systems", authWrap(handlers.NewSystemsHandler(agg)))
 	mux.HandleFunc("/analytics/alerts", authWrap(handlers.NewAlertsHandler(agg)))
+
+	// Prometheus metrics endpoint (no auth)
+	mux.Handle("/metrics", promhttp.Handler())
 
 	// Start server
 	server := &http.Server{
