@@ -1,7 +1,6 @@
 package config
 
 import (
-	"os"
 	"testing"
 	"time"
 )
@@ -9,7 +8,7 @@ import (
 func TestLoadConfigDefaults(t *testing.T) {
 	// Clear env to test defaults
 	for _, key := range []string{"REDIS_ADDR", "REDIS_PORT", "REDIS_PASSWORD", "REDISEARCH_INDEX", "SCOUT_INTERVAL", "AUTH_TOKEN", "PORT", "LOG_FORMAT", "LOG_LEVEL"} {
-		os.Unsetenv(key)
+		t.Setenv(key, "")
 	}
 
 	cfg, err := LoadConfig()

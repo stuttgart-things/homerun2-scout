@@ -106,7 +106,7 @@ func main() {
 	}
 
 	// Close Redis
-	rdb.Close()
+	_ = rdb.Close()
 
 	slog.Info("shutdown complete")
 }

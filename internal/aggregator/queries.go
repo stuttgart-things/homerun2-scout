@@ -31,8 +31,8 @@ func (a *Aggregator) aggregateSummary(ctx context.Context) *models.Summary {
 
 	rows := parseAggregateResult(result)
 	for _, row := range rows {
-		severity, _ := row["severity"]
-		countStr, _ := row["count"]
+		severity := row["severity"]
+		countStr := row["count"]
 		count, _ := strconv.ParseInt(countStr, 10, 64)
 		if severity != "" {
 			summary.SeverityCounts[severity] = count
@@ -66,8 +66,8 @@ func (a *Aggregator) aggregateSystems(ctx context.Context) *models.SystemStats {
 
 	rows := parseAggregateResult(result)
 	for _, row := range rows {
-		system, _ := row["system"]
-		countStr, _ := row["count"]
+		system := row["system"]
+		countStr := row["count"]
 		count, _ := strconv.ParseInt(countStr, 10, 64)
 		if system != "" {
 			stats.Systems = append(stats.Systems, models.SystemCount{
