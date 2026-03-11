@@ -149,16 +149,40 @@ helmfile apply -f \
 <details>
 <summary><b>Run locally</b></summary>
 
+**1. Forward Redis from the Kubernetes cluster:**
+
 ```bash
-# Set required environment variables
+kubectl port-forward -n homerun2 svc/redis-stack 6379:6379
+```
+
+**2. Set environment variables and run:**
+
+```bash
 export REDIS_ADDR=localhost
 export REDIS_PORT=6379
 export REDISEARCH_INDEX=messages
-export SCOUT_INTERVAL=30s
+export SCOUT_INTERVAL=10s
 export AUTH_TOKEN=test
+export LOG_FORMAT=text
 
-# Run
-go run main.go
+go run .
+```
+
+The service starts on port `8080`. If Redis is not reachable, it logs a warning and retries on each aggregation cycle — it will not crash.
+
+**3. Test the endpoints:**
+
+```bash
+# Health (no auth)
+curl http://localhost:8080/health
+
+# Analytics (Bearer token required)
+curl -H "Authorization: Bearer test" http://localhost:8080/analytics/summary
+curl -H "Authorization: Bearer test" http://localhost:8080/analytics/systems
+curl -H "Authorization: Bearer test" http://localhost:8080/analytics/alerts
+
+# Prometheus metrics (no auth)
+curl http://localhost:8080/metrics
 ```
 
 </details>

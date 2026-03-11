@@ -1,0 +1,14 @@
+---
+config.image: ghcr.io/stuttgart-things/homerun2-scout:latest
+config.namespace: homerun2
+config.ingressEnabled: false
+config.httpRouteEnabled: true
+config.httpRouteParentRefName: movie-scripts2-gateway
+config.httpRouteParentRefNamespace: default
+config.httpRouteHostname: homerun2-scout.movie-scripts2.sthings-vsphere.labul.sva.de
+config.redisAddr: redis-stack.redis-stack.svc.cluster.local
+config.redisPort: "6379"
+config.redisearchIndex: messages
+config.scoutInterval: "60s"
+config.authToken: Atlan7is2026!
+config.redisPassword: Atlan7is2026! # pragma: allowlist secret
