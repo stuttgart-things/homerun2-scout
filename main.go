@@ -17,6 +17,7 @@ import (
 	"github.com/stuttgart-things/homerun2-scout/internal/config"
 	"github.com/stuttgart-things/homerun2-scout/internal/handlers"
 	"github.com/stuttgart-things/homerun2-scout/internal/middleware"
+	"github.com/stuttgart-things/homerun2-scout/internal/profile"
 	"github.com/stuttgart-things/homerun2-scout/internal/retention"
 )
 
@@ -41,6 +42,29 @@ func main() {
 
 	// Print banner
 	banner.Print(version, commit, date)
+
+	// Load ScoutProfile CR (if configured) and merge into config
+	if cfg.ScoutProfileName != "" {
+		ctx := context.Background()
+		ns := os.Getenv("POD_NAMESPACE")
+		if ns == "" {
+			ns = cfg.RedisAddr // fallback: not ideal, just use homerun2 default
+			ns = "homerun2"
+		}
+		loader, lerr := profile.NewKubernetesLoader()
+		if lerr != nil {
+			slog.Warn("failed to build k8s client for ScoutProfile, using env defaults", "error", lerr)
+		} else {
+			p, lerr := loader.Load(ctx, ns, cfg.ScoutProfileName)
+			if lerr != nil {
+				slog.Warn("could not load ScoutProfile, using env defaults", "name", cfg.ScoutProfileName, "error", lerr)
+			} else if merr := profile.Merge(cfg, p); merr != nil {
+				slog.Warn("ScoutProfile merge error, using env defaults", "error", merr)
+			} else {
+				slog.Info("ScoutProfile applied", "name", cfg.ScoutProfileName, "namespace", ns)
+			}
+		}
+	}
 
 	// Connect to Redis
 	rdb := redis.NewClient(&redis.Options{

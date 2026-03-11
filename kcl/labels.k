@@ -24,6 +24,7 @@ _scoutInterval = option("config.scoutInterval")
 _authToken = option("config.authToken")
 _redisPassword = option("config.redisPassword")
 _extraEnvVars = option("config.extraEnvVars") or {}
+_scoutProfileName = option("config.scoutProfileName")
 
 # Config instance with command-line overrides
 config: schema.Scout = schema.Scout {
@@ -65,6 +66,8 @@ config: schema.Scout = schema.Scout {
         redisPassword = _redisPassword
     if _extraEnvVars:
         extraEnvVars = _extraEnvVars
+    if _scoutProfileName:
+        scoutProfileName = _scoutProfileName
 }
 
 # Common labels applied to all resources
