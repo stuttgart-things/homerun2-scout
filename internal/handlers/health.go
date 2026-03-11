@@ -25,6 +25,6 @@ func NewHealthHandler(version, commit, date string, startTime time.Time) http.Ha
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}
 }
