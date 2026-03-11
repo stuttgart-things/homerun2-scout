@@ -16,6 +16,7 @@ import (
 	"github.com/stuttgart-things/homerun2-scout/internal/config"
 	"github.com/stuttgart-things/homerun2-scout/internal/handlers"
 	"github.com/stuttgart-things/homerun2-scout/internal/middleware"
+	"github.com/stuttgart-things/homerun2-scout/internal/retention"
 )
 
 var (
@@ -58,6 +59,13 @@ func main() {
 	agg := aggregator.New(rdb, cfg.RedisearchIndex, cfg.ScoutInterval)
 	agg.Start(ctx)
 
+	// Start retention cleaner (if enabled)
+	var cleaner *retention.Cleaner
+	if cfg.RetentionEnabled {
+		cleaner = retention.New(rdb, cfg.RedisearchIndex, cfg.RetentionTTL, cfg.ScoutInterval)
+		cleaner.Start(ctx)
+	}
+
 	// Setup routes
 	mux := http.NewServeMux()
 
@@ -98,6 +106,11 @@ func main() {
 	<-quit
 
 	slog.Info("shutting down...")
+
+	// Stop retention cleaner
+	if cleaner != nil {
+		cleaner.Stop()
+	}
 
 	// Stop aggregator
 	agg.Stop()
