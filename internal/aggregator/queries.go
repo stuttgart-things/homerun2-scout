@@ -105,7 +105,7 @@ func (a *Aggregator) aggregateAlerts(ctx context.Context) *models.AlertStats {
 
 		rows := parseAggregateResult(result)
 		for _, row := range rows {
-			countStr, _ := row["count"]
+			countStr := row["count"]
 			count, _ := strconv.ParseInt(countStr, 10, 64)
 			stats.SeverityCounts[sev] = count
 			stats.TotalAlerts += count
@@ -130,8 +130,8 @@ func (a *Aggregator) aggregateAlerts(ctx context.Context) *models.AlertStats {
 
 	rows := parseAggregateResult(result)
 	for _, row := range rows {
-		system, _ := row["system"]
-		countStr, _ := row["count"]
+		system := row["system"]
+		countStr := row["count"]
 		count, _ := strconv.ParseInt(countStr, 10, 64)
 		if system != "" {
 			stats.TopSystems = append(stats.TopSystems, models.SystemCount{
