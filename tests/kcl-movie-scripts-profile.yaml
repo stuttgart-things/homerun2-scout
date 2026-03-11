@@ -1,5 +1,5 @@
 ---
-config.image: ghcr.io/stuttgart-things/homerun2-scout:latest
+config.image: ghcr.io/stuttgart-things/homerun2-scout:v0.1.0
 config.namespace: homerun2
 config.ingressEnabled: false
 config.httpRouteEnabled: true

@@ -16,7 +16,7 @@ dagger call -m github.com/stuttgart-things/dagger/kcl@v0.82.0 run \
 # render with inline parameters
 dagger call -m github.com/stuttgart-things/dagger/kcl@v0.82.0 run \
   --source kcl \
-  --parameters 'config.image=ghcr.io/stuttgart-things/homerun2-scout:v1.0.0,config.namespace=homerun2' \
+  --parameters 'config.image=ghcr.io/stuttgart-things/homerun2-scout:v0.1.0,config.namespace=homerun2' \
   export --path /tmp/rendered-homerun2-scout.yaml
 ```
 
@@ -24,7 +24,7 @@ dagger call -m github.com/stuttgart-things/dagger/kcl@v0.82.0 run \
 
 ```bash
 kcl run kcl/main.k \
-  -D 'config.image=ghcr.io/stuttgart-things/homerun2-scout:v1.0.0' \
+  -D 'config.image=ghcr.io/stuttgart-things/homerun2-scout:v0.1.0' \
   -D 'config.namespace=homerun2'
 ```
 
@@ -82,7 +82,7 @@ KUBECONFIG=~/.kube/movie-scripts kubectl apply -f /tmp/rendered-homerun2-scout.y
 
 ```yaml
 ---
-config.image: ghcr.io/stuttgart-things/homerun2-scout:v1.0.0
+config.image: ghcr.io/stuttgart-things/homerun2-scout:v0.1.0
 config.namespace: homerun2
 config.ingressEnabled: false
 config.httpRouteEnabled: true
