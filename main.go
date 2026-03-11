@@ -12,6 +12,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/redis/go-redis/v9"
 	"github.com/stuttgart-things/homerun2-scout/internal/aggregator"
+	"github.com/stuttgart-things/homerun2-scout/internal/alerter"
 	"github.com/stuttgart-things/homerun2-scout/internal/banner"
 	"github.com/stuttgart-things/homerun2-scout/internal/config"
 	"github.com/stuttgart-things/homerun2-scout/internal/handlers"
@@ -57,6 +58,18 @@ func main() {
 
 	// Start aggregator
 	agg := aggregator.New(rdb, cfg.RedisearchIndex, cfg.ScoutInterval)
+
+	// Setup threshold alerter (if configured)
+	if cfg.AlertPitcherURL != "" {
+		a := alerter.New(cfg.AlertPitcherURL, cfg.AlertPitcherToken, alerter.ThresholdConfig{
+			ErrorThreshold:    cfg.AlertErrorThreshold,
+			CriticalThreshold: cfg.AlertCriticalThreshold,
+			Cooldown:          cfg.AlertCooldown,
+		})
+		agg.SetOnCycleCallback(a.Check)
+		slog.Info("threshold alerting enabled", "pitcherURL", cfg.AlertPitcherURL)
+	}
+
 	agg.Start(ctx)
 
 	// Start retention cleaner (if enabled)

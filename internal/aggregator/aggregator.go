@@ -11,6 +11,9 @@ import (
 	"github.com/stuttgart-things/homerun2-scout/internal/models"
 )
 
+// CycleCallback is called after each aggregation cycle with the latest results.
+type CycleCallback func(ctx context.Context, summary *models.Summary, alerts *models.AlertStats)
+
 // Aggregator periodically runs FT.AGGREGATE queries and caches results.
 type Aggregator struct {
 	client   *redis.Client
@@ -22,8 +25,9 @@ type Aggregator struct {
 	systems *models.SystemStats
 	alerts  *models.AlertStats
 
-	cancel context.CancelFunc
-	done   chan struct{}
+	onCycle CycleCallback
+	cancel  context.CancelFunc
+	done    chan struct{}
 }
 
 // New creates a new Aggregator.
@@ -34,6 +38,11 @@ func New(client *redis.Client, index string, interval time.Duration) *Aggregator
 		interval: interval,
 		done:     make(chan struct{}),
 	}
+}
+
+// SetOnCycleCallback sets a callback invoked after each aggregation cycle.
+func (a *Aggregator) SetOnCycleCallback(cb CycleCallback) {
+	a.onCycle = cb
 }
 
 // Start begins the periodic aggregation loop.
@@ -134,6 +143,11 @@ func (a *Aggregator) runOnce(ctx context.Context) {
 	metrics.SystemsTotal.Set(float64(systems.Total))
 	for sev, count := range alerts.SeverityCounts {
 		metrics.AlertsTotal.WithLabelValues(sev).Set(float64(count))
+	}
+
+	// Invoke callback if set
+	if a.onCycle != nil {
+		a.onCycle(ctx, summary, alerts)
 	}
 
 	slog.Info("aggregation cycle complete",

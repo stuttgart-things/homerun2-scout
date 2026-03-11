@@ -4,22 +4,28 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strconv"
 	"time"
 )
 
 // Config holds the application configuration loaded from environment variables.
 type Config struct {
-	RedisAddr        string
-	RedisPort        string
-	RedisPassword    string
-	RedisearchIndex  string
-	ScoutInterval    time.Duration
-	RetentionTTL     time.Duration
-	RetentionEnabled bool
-	AuthToken        string
-	Port             string
-	LogFormat        string
-	LogLevel         string
+	RedisAddr              string
+	RedisPort              string
+	RedisPassword          string
+	RedisearchIndex        string
+	ScoutInterval          time.Duration
+	RetentionTTL           time.Duration
+	RetentionEnabled       bool
+	AuthToken              string
+	Port                   string
+	LogFormat              string
+	LogLevel               string
+	AlertPitcherURL        string
+	AlertPitcherToken      string
+	AlertErrorThreshold    int64
+	AlertCriticalThreshold int64
+	AlertCooldown          time.Duration
 }
 
 // LoadConfig reads configuration from environment variables with sensible defaults.
@@ -51,6 +57,32 @@ func LoadConfig() (*Config, error) {
 		cfg.RetentionTTL = ttl
 		cfg.RetentionEnabled = true
 	}
+
+	cfg.AlertPitcherURL = getEnv("ALERT_PITCHER_URL", "")
+	cfg.AlertPitcherToken = getEnv("ALERT_PITCHER_TOKEN", "")
+
+	if v := getEnv("ALERT_ERROR_THRESHOLD", ""); v != "" {
+		n, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid ALERT_ERROR_THRESHOLD %q: %w", v, err)
+		}
+		cfg.AlertErrorThreshold = n
+	}
+
+	if v := getEnv("ALERT_CRITICAL_THRESHOLD", ""); v != "" {
+		n, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid ALERT_CRITICAL_THRESHOLD %q: %w", v, err)
+		}
+		cfg.AlertCriticalThreshold = n
+	}
+
+	cooldownStr := getEnv("ALERT_COOLDOWN", "5m")
+	cooldown, err := time.ParseDuration(cooldownStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ALERT_COOLDOWN %q: %w", cooldownStr, err)
+	}
+	cfg.AlertCooldown = cooldown
 
 	return cfg, nil
 }
