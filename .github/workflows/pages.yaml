@@ -6,6 +6,9 @@ on:
     workflows: ["Release"]
     types: [completed]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   pages:
     if: >-
