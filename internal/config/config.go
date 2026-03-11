@@ -14,6 +14,8 @@ type Config struct {
 	RedisPassword    string
 	RedisearchIndex  string
 	ScoutInterval    time.Duration
+	RetentionTTL     time.Duration
+	RetentionEnabled bool
 	AuthToken        string
 	Port             string
 	LogFormat        string
@@ -39,6 +41,16 @@ func LoadConfig() (*Config, error) {
 		return nil, fmt.Errorf("invalid SCOUT_INTERVAL %q: %w", intervalStr, err)
 	}
 	cfg.ScoutInterval = d
+
+	retentionStr := getEnv("SCOUT_RETENTION_TTL", "")
+	if retentionStr != "" {
+		ttl, err := time.ParseDuration(retentionStr)
+		if err != nil {
+			return nil, fmt.Errorf("invalid SCOUT_RETENTION_TTL %q: %w", retentionStr, err)
+		}
+		cfg.RetentionTTL = ttl
+		cfg.RetentionEnabled = true
+	}
 
 	return cfg, nil
 }
