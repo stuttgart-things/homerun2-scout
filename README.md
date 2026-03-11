@@ -13,7 +13,7 @@ A Go microservice that periodically analyzes messages indexed in RediSearch and 
 | `/analytics/summary` | `GET` | Bearer token | Severity counts, total messages |
 | `/analytics/systems` | `GET` | Bearer token | Per-system message counts (top 20) |
 | `/analytics/alerts` | `GET` | Bearer token | Alert frequency, top alerting systems |
-| `/metrics` | `GET` | None | Prometheus metrics |
+| `/metrics` | `GET` | None | Prometheus metrics ([Grafana integration](https://stuttgart-things.github.io/homerun2-scout/grafana/)) |
 
 <details>
 <summary><b>Analytics summary</b></summary>
