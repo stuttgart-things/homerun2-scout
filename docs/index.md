@@ -28,6 +28,7 @@ go run main.go
 | `/analytics/summary`   | GET    | Bearer   | Severity counts, total messages          |
 | `/analytics/systems`   | GET    | Bearer   | Per-system message counts, top N         |
 | `/analytics/alerts`    | GET    | Bearer   | Alert frequency, top alerting systems    |
+| `/metrics`             | GET    | No       | Prometheus metrics                       |
 
 ## Authentication
 
@@ -43,23 +44,33 @@ curl http://localhost:8080/analytics/summary \
 - **Go** stdlib `net/http` — HTTP server with graceful shutdown
 - **RediSearch** — `FT.AGGREGATE` queries for analytics
 - **time.Ticker** — Periodic aggregation on configurable interval
+- **ScoutProfile CRD** — Kubernetes-native business logic configuration
 - **ko** — Container image builds (distroless)
 - **KCL** — Kubernetes manifest generation
 - **Dagger** — CI/CD pipeline functions
 
 ## Configuration
 
-| Variable            | Default     | Description                          |
-|---------------------|-------------|--------------------------------------|
-| `REDIS_ADDR`        | `localhost` | Redis host                           |
-| `REDIS_PORT`        | `6379`      | Redis port                           |
-| `REDIS_PASSWORD`    | (empty)     | Redis password                       |
-| `REDISEARCH_INDEX`  | `messages`  | RediSearch index name                |
-| `SCOUT_INTERVAL`    | `60s`       | Aggregation interval                 |
-| `AUTH_TOKEN`        | (empty)     | Bearer token for API auth            |
-| `PORT`              | `8080`      | HTTP server port                     |
-| `LOG_FORMAT`        | `json`      | Log format (`json` or `text`)        |
-| `LOG_LEVEL`         | `info`      | Log level (`debug`, `info`, `warn`, `error`) |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `REDIS_ADDR` | `localhost` | Redis host |
+| `REDIS_PORT` | `6379` | Redis port |
+| `REDIS_PASSWORD` | (empty) | Redis password |
+| `REDISEARCH_INDEX` | `messages` | RediSearch index name |
+| `SCOUT_INTERVAL` | `60s` | Aggregation interval |
+| `SCOUT_PROFILE_NAME` | (empty) | ScoutProfile CR name to load at startup |
+| `SCOUT_RETENTION_TTL` | (empty) | Retention TTL for index cleanup |
+| `AUTH_TOKEN` | (empty) | Bearer token for API auth |
+| `PORT` | `8080` | HTTP server port |
+| `LOG_FORMAT` | `json` | Log format (`json` or `text`) |
+| `LOG_LEVEL` | `info` | Log level (`debug`, `info`, `warn`, `error`) |
+| `ALERT_PITCHER_URL` | (empty) | omni-pitcher `/pitch` endpoint |
+| `ALERT_PITCHER_TOKEN` | (empty) | Bearer token for omni-pitcher |
+| `ALERT_ERROR_THRESHOLD` | `0` | Error count threshold to trigger alert |
+| `ALERT_CRITICAL_THRESHOLD` | `0` | Critical count threshold to trigger alert |
+| `ALERT_COOLDOWN` | `5m` | Minimum time between alerts |
+
+> When `SCOUT_PROFILE_NAME` is set, the corresponding `ScoutProfile` CR overrides these env var values at startup. See [ScoutProfile](scout-profile.md).
 
 ## Prerequisites
 

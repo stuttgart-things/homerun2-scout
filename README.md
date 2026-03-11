@@ -13,6 +13,7 @@ A Go microservice that periodically analyzes messages indexed in RediSearch and 
 | `/analytics/summary` | `GET` | Bearer token | Severity counts, total messages |
 | `/analytics/systems` | `GET` | Bearer token | Per-system message counts (top 20) |
 | `/analytics/alerts` | `GET` | Bearer token | Alert frequency, top alerting systems |
+| `/metrics` | `GET` | None | Prometheus metrics |
 
 <details>
 <summary><b>Analytics summary</b></summary>
@@ -115,7 +116,7 @@ docker run -p 8080:8080 \
 <details>
 <summary><b>Deploy to Kubernetes with KCL</b></summary>
 
-KCL manifests in `kcl/` are the source of truth for Kubernetes deployment. The modular KCL modules cover: `deploy.k`, `service.k`, `ingress.k`, `secret.k`, `configmap.k`, `serviceaccount.k`, `namespace.k`, `httproute.k`.
+KCL manifests in `kcl/` are the source of truth for Kubernetes deployment. The modular KCL modules cover: `deploy.k`, `service.k`, `ingress.k`, `secret.k`, `configmap.k`, `serviceaccount.k`, `namespace.k`, `httproute.k`, `crd.k` (ScoutProfile CRD), `rbac.k` (RBAC for ScoutProfile).
 
 **Render manifests locally:**
 
@@ -125,6 +126,37 @@ kcl run kcl/ -Y tests/kcl-deploy-profile.yaml
 
 # Render via Dagger (non-interactive)
 task render-manifests-quick
+```
+
+</details>
+
+<details>
+<summary><b>ScoutProfile — Kubernetes CR for business logic config</b></summary>
+
+`ScoutProfile` is a Kubernetes Custom Resource (`homerun2.stuttgart-things.com/v1alpha1`) that holds the scout's runtime behaviour config (thresholds, retention, alerting), separate from deployment config.
+
+Set `SCOUT_PROFILE_NAME` (KCL default: `default`) to activate it. At startup, the scout reads the named CR from its namespace and merges non-empty fields into the active config. If the CR is missing or unreachable, the scout starts normally with env var defaults — no crash.
+
+```yaml
+apiVersion: homerun2.stuttgart-things.com/v1alpha1
+kind: ScoutProfile
+metadata:
+  name: default
+  namespace: homerun2
+spec:
+  scoutInterval: 60s
+  retention:
+    enabled: true
+    ttl: 168h
+  alerting:
+    pitcherURL: https://homerun2-omni-pitcher.example.com/pitch
+    errorThreshold: 50
+    criticalThreshold: 10
+    cooldown: 5m
+```
+
+```bash
+kubectl apply -f tests/scout-profile-movie-scripts.yaml
 ```
 
 </details>
@@ -194,13 +226,18 @@ curl http://localhost:8080/metrics
 main.go                    # Entrypoint, routing, aggregator, graceful shutdown
 internal/
   aggregator/              # Periodic FT.AGGREGATE queries, result caching
+  alerter/                 # Threshold alerting via omni-pitcher
   banner/                  # Startup banner (lipgloss)
   config/                  # Env-based config loading, slog setup
   handlers/                # HTTP handlers (analytics, health)
+  metrics/                 # Prometheus metrics registration
   middleware/              # Auth (Bearer token), request logging
   models/                  # Analytics response structs
+  profile/                 # ScoutProfile CRD loader and merge logic
+  retention/               # Periodic RediSearch index cleanup
 kcl/                       # Kubernetes manifests (modular KCL)
 dagger/                    # CI functions (Lint, Build, Test, Scan)
+tests/                     # Deploy profiles and sample CRs
 .ko.yaml                   # ko build configuration
 Taskfile.yaml              # Task runner
 ```
@@ -218,9 +255,18 @@ Taskfile.yaml              # Task runner
 | `REDIS_PASSWORD` | Redis password | (empty) |
 | `REDISEARCH_INDEX` | RediSearch index name | `messages` |
 | `SCOUT_INTERVAL` | Aggregation interval (Go duration) | `60s` |
+| `SCOUT_PROFILE_NAME` | ScoutProfile CR name to load at startup | (empty) |
+| `SCOUT_RETENTION_TTL` | Retention TTL for index cleanup | (empty) |
 | `AUTH_TOKEN` | Bearer token for API auth | (empty = no auth) |
 | `LOG_FORMAT` | Log format: `json` or `text` | `json` |
 | `LOG_LEVEL` | Log level: `debug`, `info`, `warn`, `error` | `info` |
+| `ALERT_PITCHER_URL` | omni-pitcher `/pitch` endpoint | (empty) |
+| `ALERT_PITCHER_TOKEN` | Bearer token for omni-pitcher | (empty) |
+| `ALERT_ERROR_THRESHOLD` | Error count threshold to trigger alert | `0` |
+| `ALERT_CRITICAL_THRESHOLD` | Critical count threshold to trigger alert | `0` |
+| `ALERT_COOLDOWN` | Minimum time between alerts | `5m` |
+
+> When `SCOUT_PROFILE_NAME` is set, the corresponding `ScoutProfile` CR overrides these env var values at startup. See [ScoutProfile docs](https://stuttgart-things.github.io/homerun2-scout/scout-profile/) for the full schema.
 
 </details>
 
