@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.2.0...v0.2.1) (2026-03-11)
+
+
+### Bug Fixes
+
+* allow main branch to deploy github-pages and opt into Node.js 24 ([0b637e1](https://github.com/stuttgart-things/homerun2-scout/commit/0b637e1c1c6d42a5986eb0dfad77723296eed448))
+
 # [0.2.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.1.0...v0.2.0) (2026-03-11)
 
 
