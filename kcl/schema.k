@@ -52,6 +52,9 @@ schema Scout:
     authToken: str = ""
     redisPassword: str = ""
 
+    # ScoutProfile CRD name to load at startup (empty = disabled)
+    scoutProfileName: str = "default"
+
     # Extra environment variables
     extraEnvVars: {str:str} = {}
 

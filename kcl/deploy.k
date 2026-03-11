@@ -80,6 +80,18 @@ deployment = {
                                 value: config.redisearchIndex
                             }
                             {
+                                name: "SCOUT_PROFILE_NAME"
+                                value: config.scoutProfileName
+                            }
+                            {
+                                name: "POD_NAMESPACE"
+                                valueFrom: {
+                                    fieldRef: {
+                                        fieldPath: "metadata.namespace"
+                                    }
+                                }
+                            }
+                            {
                                 name: "SCOUT_INTERVAL"
                                 value: config.scoutInterval
                             }

@@ -1,0 +1,17 @@
+---
+apiVersion: homerun2.stuttgart-things.com/v1alpha1
+kind: ScoutProfile
+metadata:
+  name: default
+  namespace: homerun2
+spec:
+  scoutInterval: 60s
+  retention:
+    enabled: true
+    ttl: 168h
+  alerting:
+    pitcherURL: https://homerun2-omni-pitcher.movie-scripts2.sthings-vsphere.labul.sva.de/pitch
+    errorThreshold: 50
+    criticalThreshold: 10
+    cooldown: 5m
+    # pitcherToken: use ALERT_PITCHER_TOKEN env var (Secret) instead of storing here

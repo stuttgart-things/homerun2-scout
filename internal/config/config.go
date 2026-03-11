@@ -26,6 +26,7 @@ type Config struct {
 	AlertErrorThreshold    int64
 	AlertCriticalThreshold int64
 	AlertCooldown          time.Duration
+	ScoutProfileName       string
 }
 
 // LoadConfig reads configuration from environment variables with sensible defaults.
@@ -58,6 +59,7 @@ func LoadConfig() (*Config, error) {
 		cfg.RetentionEnabled = true
 	}
 
+	cfg.ScoutProfileName = getEnv("SCOUT_PROFILE_NAME", "")
 	cfg.AlertPitcherURL = getEnv("ALERT_PITCHER_URL", "")
 	cfg.AlertPitcherToken = getEnv("ALERT_PITCHER_TOKEN", "")
 
