@@ -1,6 +1,6 @@
 module github.com/stuttgart-things/homerun2-scout
 
-go 1.25.5
+go 1.25.0
 
 require (
 	charm.land/lipgloss/v2 v2.0.1
