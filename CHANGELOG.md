@@ -1,3 +1,10 @@
+## [0.5.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.5.0...v0.5.1) (2026-03-12)
+
+
+### Bug Fixes
+
+* recognize 'Unknown index name' error in EnsureIndex ([4b98630](https://github.com/stuttgart-things/homerun2-scout/commit/4b9863078be8a6dea247616487582ec9464cf413)), closes [#43](https://github.com/stuttgart-things/homerun2-scout/issues/43)
+
 # [0.5.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.4.4...v0.5.0) (2026-03-12)
 
 
