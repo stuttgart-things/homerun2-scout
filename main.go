@@ -70,6 +70,7 @@ func main() {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     cfg.RedisAddress(),
 		Password: cfg.RedisPassword,
+		Protocol: 2, // Force RESP2 for RediSearch FT.AGGREGATE compatibility
 	})
 
 	// Health check Redis
