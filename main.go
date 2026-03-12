@@ -107,7 +107,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Root endpoint (no auth) — service info and available routes
-	mux.HandleFunc("GET /", middleware.LoggingMiddleware(
+	mux.HandleFunc("GET /{$}", middleware.LoggingMiddleware(
 		handlers.NewRootHandler(version),
 	))
 
