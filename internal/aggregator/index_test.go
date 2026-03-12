@@ -6,15 +6,16 @@ import (
 )
 
 func TestEnsureIndexSchema(t *testing.T) {
-	// Verify the expected FT.CREATE args contain all required fields
+	// Verify the expected FT.CREATE args contain all required fields as TEXT
+	// TEXT is required (not TAG) for FT.AGGREGATE GROUPBY to return grouped rows
 	expectedFields := []string{
-		"$.severity", "severity", "TAG",
-		"$.system", "system", "TAG",
+		"$.severity", "severity", "TEXT",
+		"$.system", "system", "TEXT",
 		"$.timestamp", "timestamp", "TEXT",
 		"$.title", "title", "TEXT",
 		"$.message", "message", "TEXT",
-		"$.author", "author", "TAG",
-		"$.tags", "tags", "TAG",
+		"$.author", "author", "TEXT",
+		"$.tags", "tags", "TEXT",
 	}
 
 	// Build the args as EnsureIndex would
@@ -22,13 +23,13 @@ func TestEnsureIndexSchema(t *testing.T) {
 		"FT.CREATE", "messages",
 		"ON", "JSON",
 		"SCHEMA",
-		"$.severity", "AS", "severity", "TAG",
-		"$.system", "AS", "system", "TAG",
+		"$.severity", "AS", "severity", "TEXT",
+		"$.system", "AS", "system", "TEXT",
 		"$.timestamp", "AS", "timestamp", "TEXT",
 		"$.title", "AS", "title", "TEXT",
 		"$.message", "AS", "message", "TEXT",
-		"$.author", "AS", "author", "TAG",
-		"$.tags", "AS", "tags", "TAG",
+		"$.author", "AS", "author", "TEXT",
+		"$.tags", "AS", "tags", "TEXT",
 	}
 	joined := strings.Join(args, " ")
 
@@ -50,5 +51,20 @@ func TestEnsureIndexArgsStructure(t *testing.T) {
 
 	if !strings.Contains(joined, "ON JSON") {
 		t.Error("index should be created ON JSON, not HASH")
+	}
+}
+
+func TestEnsureIndexNoTagFields(t *testing.T) {
+	// TAG fields on JSON indexes break FT.AGGREGATE GROUPBY (returns only count, no rows)
+	args := []string{
+		"$.severity", "AS", "severity", "TEXT",
+		"$.system", "AS", "system", "TEXT",
+		"$.author", "AS", "author", "TEXT",
+		"$.tags", "AS", "tags", "TEXT",
+	}
+	joined := strings.Join(args, " ")
+
+	if strings.Contains(joined, "TAG") {
+		t.Error("schema should not use TAG type — use TEXT for FT.AGGREGATE GROUPBY compatibility")
 	}
 }

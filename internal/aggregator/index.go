@@ -24,24 +24,19 @@ func (a *Aggregator) EnsureIndex(ctx context.Context) error {
 	slog.Info("redisearch index not found, creating", "index", a.index)
 
 	// FT.CREATE <index> ON JSON SCHEMA
-	//   $.severity AS severity TAG
-	//   $.system   AS system   TAG
-	//   $.timestamp AS timestamp TEXT
-	//   $.title    AS title    TEXT
-	//   $.message  AS message  TEXT
-	//   $.author   AS author   TAG
-	//   $.tags     AS tags     TAG
+	// severity and system use TEXT (not TAG) to support FT.AGGREGATE GROUPBY.
+	// TAG fields on JSON indexes return only the total count without grouped rows.
 	args := []interface{}{
 		"FT.CREATE", a.index,
 		"ON", "JSON",
 		"SCHEMA",
-		"$.severity", "AS", "severity", "TAG",
-		"$.system", "AS", "system", "TAG",
+		"$.severity", "AS", "severity", "TEXT",
+		"$.system", "AS", "system", "TEXT",
 		"$.timestamp", "AS", "timestamp", "TEXT",
 		"$.title", "AS", "title", "TEXT",
 		"$.message", "AS", "message", "TEXT",
-		"$.author", "AS", "author", "TAG",
-		"$.tags", "AS", "tags", "TAG",
+		"$.author", "AS", "author", "TEXT",
+		"$.tags", "AS", "tags", "TEXT",
 	}
 
 	if err := a.client.Do(ctx, args...).Err(); err != nil {

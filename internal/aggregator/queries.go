@@ -92,7 +92,7 @@ func (a *Aggregator) aggregateAlerts(ctx context.Context) *models.AlertStats {
 	for _, sev := range []string{"error", "critical"} {
 		args := []interface{}{
 			"FT.AGGREGATE", a.index,
-			"@severity:{" + sev + "}",
+			"@severity:(" + sev + ")",
 			"GROUPBY", "0",
 			"REDUCE", "COUNT", "0", "AS", "count",
 		}
@@ -115,7 +115,7 @@ func (a *Aggregator) aggregateAlerts(ctx context.Context) *models.AlertStats {
 	// Top systems with error/critical
 	args := []interface{}{
 		"FT.AGGREGATE", a.index,
-		"@severity:{error|critical}",
+		"@severity:(error|critical)",
 		"GROUPBY", "1", "@system",
 		"REDUCE", "COUNT", "0", "AS", "count",
 		"SORTBY", "2", "@count", "DESC",
