@@ -1,3 +1,10 @@
+## [0.4.3](https://github.com/stuttgart-things/homerun2-scout/compare/v0.4.2...v0.4.3) (2026-03-12)
+
+
+### Bug Fixes
+
+* use TEXT instead of TAG fields for FT.AGGREGATE GROUPBY compatibility ([2780c81](https://github.com/stuttgart-things/homerun2-scout/commit/2780c8184e0f825273b9a913da25995ffe7b6eb8)), closes [#33](https://github.com/stuttgart-things/homerun2-scout/issues/33)
+
 ## [0.4.2](https://github.com/stuttgart-things/homerun2-scout/compare/v0.4.1...v0.4.2) (2026-03-12)
 
 
