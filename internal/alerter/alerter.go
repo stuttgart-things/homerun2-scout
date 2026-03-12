@@ -64,7 +64,7 @@ func (a *Alerter) Check(ctx context.Context, summary *models.Summary, alerts *mo
 			a.sendAlert(ctx, "error-threshold", PitchRequest{
 				Title:    "Scout: Error threshold exceeded",
 				Message:  fmt.Sprintf("Error count %d exceeds threshold %d", errorCount, a.thresholds.ErrorThreshold),
-				Severity: "warning",
+				Severity: "WARNING",
 				Author:   "homerun2-scout",
 				System:   "homerun2-scout",
 				Tags:     "scout,threshold,error",
@@ -78,7 +78,7 @@ func (a *Alerter) Check(ctx context.Context, summary *models.Summary, alerts *mo
 			a.sendAlert(ctx, "critical-threshold", PitchRequest{
 				Title:    "Scout: Critical threshold exceeded",
 				Message:  fmt.Sprintf("Critical count %d exceeds threshold %d", criticalCount, a.thresholds.CriticalThreshold),
-				Severity: "critical",
+				Severity: "CRITICAL",
 				Author:   "homerun2-scout",
 				System:   "homerun2-scout",
 				Tags:     "scout,threshold,critical",
@@ -93,7 +93,7 @@ func (a *Alerter) Check(ctx context.Context, summary *models.Summary, alerts *mo
 			a.sendAlert(ctx, "total-alerts-threshold", PitchRequest{
 				Title:    "Scout: Total alerts threshold exceeded",
 				Message:  fmt.Sprintf("Total alerts %d exceeds combined threshold %d", alerts.TotalAlerts, totalThreshold),
-				Severity: "error",
+				Severity: "ERROR",
 				Author:   "homerun2-scout",
 				System:   "homerun2-scout",
 				Tags:     "scout,threshold,alerts",
