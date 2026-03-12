@@ -48,7 +48,6 @@ func main() {
 		ctx := context.Background()
 		ns := os.Getenv("POD_NAMESPACE")
 		if ns == "" {
-			ns = cfg.RedisAddr // fallback: not ideal, just use homerun2 default
 			ns = "homerun2"
 		}
 		loader, lerr := profile.NewKubernetesLoader()
