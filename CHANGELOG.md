@@ -1,3 +1,10 @@
+## [0.4.4](https://github.com/stuttgart-things/homerun2-scout/compare/v0.4.3...v0.4.4) (2026-03-12)
+
+
+### Bug Fixes
+
+* add 30s timeout to FT.AGGREGATE queries to prevent empty results ([b0d9f12](https://github.com/stuttgart-things/homerun2-scout/commit/b0d9f128f4e93c285d66912021037e1611d0f5be))
+
 ## [0.4.3](https://github.com/stuttgart-things/homerun2-scout/compare/v0.4.2...v0.4.3) (2026-03-12)
 
 
