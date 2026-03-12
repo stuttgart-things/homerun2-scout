@@ -1,3 +1,10 @@
+## [0.6.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.6.0...v0.6.1) (2026-03-12)
+
+
+### Bug Fixes
+
+* use exact path match for root endpoint to avoid route conflict ([cdf84e7](https://github.com/stuttgart-things/homerun2-scout/commit/cdf84e762c002991671c7f4af97278ecc1de6da7))
+
 # [0.6.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.5.1...v0.6.0) (2026-03-12)
 
 
