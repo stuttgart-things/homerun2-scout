@@ -16,8 +16,9 @@ func (a *Aggregator) EnsureIndex(ctx context.Context) error {
 		return nil
 	}
 
-	// If the error is not "no such index", something else is wrong
-	if !strings.Contains(err.Error(), "no such index") {
+	// If the error is not about a missing index, something else is wrong
+	errMsg := err.Error()
+	if !strings.Contains(errMsg, "no such index") && !strings.Contains(errMsg, "Unknown index name") {
 		return err
 	}
 
