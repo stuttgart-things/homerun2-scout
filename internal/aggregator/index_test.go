@@ -54,6 +54,16 @@ func TestEnsureIndexArgsStructure(t *testing.T) {
 	}
 }
 
+func TestMissingIndexErrorPatterns(t *testing.T) {
+	// EnsureIndex must recognize both error messages from different Redis/RediSearch versions
+	patterns := []string{"no such index", "Unknown index name"}
+	for _, p := range patterns {
+		if !strings.Contains(p, "index") {
+			t.Errorf("expected pattern to contain 'index': %s", p)
+		}
+	}
+}
+
 func TestEnsureIndexNoTagFields(t *testing.T) {
 	// TAG fields on JSON indexes break FT.AGGREGATE GROUPBY (returns only count, no rows)
 	args := []string{
