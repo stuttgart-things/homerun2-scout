@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.3.0...v0.4.0) (2026-03-12)
+
+
+### Features
+
+* ensure RediSearch index exists on startup ([5217ef4](https://github.com/stuttgart-things/homerun2-scout/commit/5217ef45a86f501bdd806af6c6baa8a4193737c3)), closes [#28](https://github.com/stuttgart-things/homerun2-scout/issues/28)
+
 # [0.3.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.2.1...v0.3.0) (2026-03-11)
 
 
