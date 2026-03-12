@@ -49,6 +49,11 @@ func (a *Aggregator) SetOnCycleCallback(cb CycleCallback) {
 func (a *Aggregator) Start(ctx context.Context) {
 	ctx, a.cancel = context.WithCancel(ctx)
 
+	// Ensure the RediSearch index exists before querying
+	if err := a.EnsureIndex(ctx); err != nil {
+		slog.Warn("failed to ensure redisearch index", "index", a.index, "error", err)
+	}
+
 	// Run immediately on start
 	a.runOnce(ctx)
 
