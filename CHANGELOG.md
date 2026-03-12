@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.4.4...v0.5.0) (2026-03-12)
+
+
+### Features
+
+* fix document retention and add Redis Stream trimming ([ee0b225](https://github.com/stuttgart-things/homerun2-scout/commit/ee0b22514668065cc87ef50bc64850f87fc096f7)), closes [#36](https://github.com/stuttgart-things/homerun2-scout/issues/36)
+
 ## [0.4.4](https://github.com/stuttgart-things/homerun2-scout/compare/v0.4.3...v0.4.4) (2026-03-12)
 
 
