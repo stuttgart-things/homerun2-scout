@@ -21,6 +21,7 @@ func (a *Aggregator) aggregateSummary(ctx context.Context) *models.Summary {
 		"FT.AGGREGATE", a.index, "*",
 		"GROUPBY", "1", "@severity",
 		"REDUCE", "COUNT", "0", "AS", "count",
+		"TIMEOUT", "30000",
 	}
 
 	result, err := a.client.Do(ctx, args...).Result()
@@ -56,6 +57,7 @@ func (a *Aggregator) aggregateSystems(ctx context.Context) *models.SystemStats {
 		"REDUCE", "COUNT", "0", "AS", "count",
 		"SORTBY", "2", "@count", "DESC",
 		"MAX", "20",
+		"TIMEOUT", "30000",
 	}
 
 	result, err := a.client.Do(ctx, args...).Result()
@@ -95,6 +97,7 @@ func (a *Aggregator) aggregateAlerts(ctx context.Context) *models.AlertStats {
 			"@severity:(" + sev + ")",
 			"GROUPBY", "0",
 			"REDUCE", "COUNT", "0", "AS", "count",
+			"TIMEOUT", "30000",
 		}
 
 		result, err := a.client.Do(ctx, args...).Result()
@@ -120,6 +123,7 @@ func (a *Aggregator) aggregateAlerts(ctx context.Context) *models.AlertStats {
 		"REDUCE", "COUNT", "0", "AS", "count",
 		"SORTBY", "2", "@count", "DESC",
 		"MAX", "10",
+		"TIMEOUT", "30000",
 	}
 
 	result, err := a.client.Do(ctx, args...).Result()
