@@ -22,13 +22,14 @@ func Merge(cfg *config.Config, p *ScoutProfile) error {
 		cfg.ScoutInterval = d
 	}
 
+	// Retention: CR can override both enabled flag and TTL independently
+	cfg.RetentionEnabled = p.Retention.Enabled
 	if p.Retention.TTL != "" {
 		ttl, err := time.ParseDuration(p.Retention.TTL)
 		if err != nil {
 			return fmt.Errorf("invalid retention.ttl %q: %w", p.Retention.TTL, err)
 		}
 		cfg.RetentionTTL = ttl
-		cfg.RetentionEnabled = p.Retention.Enabled
 	}
 
 	if p.Alerting.PitcherURL != "" {

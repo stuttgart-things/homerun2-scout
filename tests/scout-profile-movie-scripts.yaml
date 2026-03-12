@@ -8,7 +8,7 @@ spec:
   scoutInterval: 60s
   retention:
     enabled: true
-    ttl: 168h
+    ttl: 48h
   alerting:
     pitcherURL: https://homerun2-omni-pitcher.movie-scripts2.sthings-vsphere.labul.sva.de/pitch
     errorThreshold: 50

@@ -49,15 +49,13 @@ func LoadConfig() (*Config, error) {
 	}
 	cfg.ScoutInterval = d
 
-	retentionStr := getEnv("SCOUT_RETENTION_TTL", "")
-	if retentionStr != "" {
-		ttl, err := time.ParseDuration(retentionStr)
-		if err != nil {
-			return nil, fmt.Errorf("invalid SCOUT_RETENTION_TTL %q: %w", retentionStr, err)
-		}
-		cfg.RetentionTTL = ttl
-		cfg.RetentionEnabled = true
+	retentionStr := getEnv("SCOUT_RETENTION_TTL", "48h")
+	ttl, err := time.ParseDuration(retentionStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid SCOUT_RETENTION_TTL %q: %w", retentionStr, err)
 	}
+	cfg.RetentionTTL = ttl
+	cfg.RetentionEnabled = getEnv("SCOUT_RETENTION_ENABLED", "true") == "true"
 
 	cfg.ScoutProfileName = getEnv("SCOUT_PROFILE_NAME", "")
 	cfg.AlertPitcherURL = getEnv("ALERT_PITCHER_URL", "")

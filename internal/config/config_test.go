@@ -7,7 +7,7 @@ import (
 
 func TestLoadConfigDefaults(t *testing.T) {
 	// Clear env to test defaults
-	for _, key := range []string{"REDIS_ADDR", "REDIS_PORT", "REDIS_PASSWORD", "REDISEARCH_INDEX", "SCOUT_INTERVAL", "AUTH_TOKEN", "PORT", "LOG_FORMAT", "LOG_LEVEL"} {
+	for _, key := range []string{"REDIS_ADDR", "REDIS_PORT", "REDIS_PASSWORD", "REDISEARCH_INDEX", "SCOUT_INTERVAL", "SCOUT_RETENTION_TTL", "SCOUT_RETENTION_ENABLED", "AUTH_TOKEN", "PORT", "LOG_FORMAT", "LOG_LEVEL"} {
 		t.Setenv(key, "")
 	}
 
@@ -33,6 +33,12 @@ func TestLoadConfigDefaults(t *testing.T) {
 	}
 	if cfg.LogFormat != "json" {
 		t.Errorf("LogFormat = %q, want %q", cfg.LogFormat, "json")
+	}
+	if cfg.RetentionTTL != 48*time.Hour {
+		t.Errorf("RetentionTTL = %v, want %v", cfg.RetentionTTL, 48*time.Hour)
+	}
+	if !cfg.RetentionEnabled {
+		t.Error("RetentionEnabled should default to true")
 	}
 }
 

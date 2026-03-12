@@ -10,8 +10,8 @@ import (
 func baseConfig() *config.Config {
 	return &config.Config{
 		ScoutInterval:          60 * time.Second,
-		RetentionEnabled:       false,
-		RetentionTTL:           0,
+		RetentionEnabled:       true,
+		RetentionTTL:           48 * time.Hour,
 		AlertPitcherURL:        "",
 		AlertPitcherToken:      "",
 		AlertErrorThreshold:    0,
