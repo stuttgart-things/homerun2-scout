@@ -20,8 +20,8 @@ func TestCheck_ErrorThresholdExceeded(t *testing.T) {
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			t.Errorf("decode error: %v", err)
 		}
-		if req.Severity != "warning" {
-			t.Errorf("severity = %q, want %q", req.Severity, "warning")
+		if req.Severity != "WARNING" {
+			t.Errorf("severity = %q, want %q", req.Severity, "WARNING")
 		}
 		w.WriteHeader(http.StatusOK)
 	}))
