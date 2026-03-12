@@ -147,7 +147,7 @@ spec:
   scoutInterval: 60s
   retention:
     enabled: true
-    ttl: 168h
+    ttl: 48h
   alerting:
     pitcherURL: https://homerun2-omni-pitcher.example.com/pitch
     errorThreshold: 50
@@ -234,7 +234,7 @@ internal/
   middleware/              # Auth (Bearer token), request logging
   models/                  # Analytics response structs
   profile/                 # ScoutProfile CRD loader and merge logic
-  retention/               # Periodic RediSearch index cleanup
+  retention/               # Periodic cleanup of expired JSON docs + Redis Stream trimming
 kcl/                       # Kubernetes manifests (modular KCL)
 dagger/                    # CI functions (Lint, Build, Test, Scan)
 tests/                     # Deploy profiles and sample CRs
@@ -256,7 +256,8 @@ Taskfile.yaml              # Task runner
 | `REDISEARCH_INDEX` | RediSearch index name | `messages` |
 | `SCOUT_INTERVAL` | Aggregation interval (Go duration) | `60s` |
 | `SCOUT_PROFILE_NAME` | ScoutProfile CR name to load at startup | (empty) |
-| `SCOUT_RETENTION_TTL` | Retention TTL for index cleanup | (empty) |
+| `SCOUT_RETENTION_TTL` | Retention TTL — prunes expired JSON documents and trims the Redis Stream via `XTRIM MINID` | `48h` |
+| `SCOUT_RETENTION_ENABLED` | Enable/disable retention cleaner | `true` |
 | `AUTH_TOKEN` | Bearer token for API auth | (empty = no auth) |
 | `LOG_FORMAT` | Log format: `json` or `text` | `json` |
 | `LOG_LEVEL` | Log level: `debug`, `info`, `warn`, `error` | `info` |

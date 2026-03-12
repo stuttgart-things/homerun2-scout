@@ -15,8 +15,8 @@ metadata:
 spec:
   scoutInterval: 60s        # Aggregation interval (Go duration)
   retention:
-    enabled: true           # Enable periodic RediSearch index cleanup
-    ttl: 168h               # Max age of entries to keep (Go duration)
+    enabled: true           # Enable periodic cleanup of expired JSON docs + Redis Stream trimming
+    ttl: 48h                # Max age of entries to keep (Go duration, default: 48h)
   alerting:
     pitcherURL: https://...  # omni-pitcher /pitch endpoint
     pitcherToken: ""         # Bearer token — prefer ALERT_PITCHER_TOKEN env var
@@ -102,7 +102,7 @@ Leave `SCOUT_PROFILE_NAME` unset — profile loading is skipped entirely and all
 export ALERT_PITCHER_URL=http://localhost:8081/pitch
 export ALERT_ERROR_THRESHOLD=50
 export ALERT_CRITICAL_THRESHOLD=10
-export SCOUT_RETENTION_TTL=168h
+export SCOUT_RETENTION_TTL=48h
 go run .
 ```
 
@@ -114,11 +114,11 @@ Go duration string (e.g. `30s`, `2m`, `1h`). Overrides `SCOUT_INTERVAL` env var.
 
 ### `spec.retention.enabled`
 
-Boolean. Enables periodic cleanup of RediSearch entries older than `ttl`.
+Boolean. Enables periodic cleanup of expired JSON documents (via `FT.SEARCH` + `DEL`) and Redis Stream trimming (via `XTRIM MINID`). Default: `true`.
 
 ### `spec.retention.ttl`
 
-Go duration string (e.g. `168h` = 7 days). Overrides `SCOUT_RETENTION_TTL` env var.
+Go duration string (e.g. `48h` = 2 days). Overrides `SCOUT_RETENTION_TTL` env var. Default: `48h`.
 
 ### `spec.alerting.pitcherURL`
 
