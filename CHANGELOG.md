@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.4.0...v0.4.1) (2026-03-12)
+
+
+### Bug Fixes
+
+* force RESP2 protocol for RediSearch FT.AGGREGATE compatibility ([4df847f](https://github.com/stuttgart-things/homerun2-scout/commit/4df847f17b3ade01ddbd7bcbf87053d26d3ddfa3)), closes [#30](https://github.com/stuttgart-things/homerun2-scout/issues/30)
+
 # [0.4.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.3.0...v0.4.0) (2026-03-12)
 
 
