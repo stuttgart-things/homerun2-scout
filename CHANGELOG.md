@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.5.1...v0.6.0) (2026-03-12)
+
+
+### Features
+
+* add root endpoint with service info and available routes ([0aeb9e8](https://github.com/stuttgart-things/homerun2-scout/commit/0aeb9e8ef4c93fe47007d40190a13bd95dfe587f)), closes [#46](https://github.com/stuttgart-things/homerun2-scout/issues/46)
+
 ## [0.5.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.5.0...v0.5.1) (2026-03-12)
 
 
