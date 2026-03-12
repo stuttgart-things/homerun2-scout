@@ -106,6 +106,11 @@ func main() {
 	// Setup routes
 	mux := http.NewServeMux()
 
+	// Root endpoint (no auth) — service info and available routes
+	mux.HandleFunc("GET /", middleware.LoggingMiddleware(
+		handlers.NewRootHandler(version),
+	))
+
 	// Health endpoint (no auth)
 	mux.HandleFunc("/health", middleware.LoggingMiddleware(
 		handlers.NewHealthHandler(version, commit, date, startTime),
