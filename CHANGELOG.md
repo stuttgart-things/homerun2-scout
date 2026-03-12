@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/stuttgart-things/homerun2-scout/compare/v0.4.1...v0.4.2) (2026-03-12)
+
+
+### Bug Fixes
+
+* remove ineffectual assignment flagged by linter ([68a4192](https://github.com/stuttgart-things/homerun2-scout/commit/68a4192cc56135441b1f1087928ef713660dd9b0))
+
 ## [0.4.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.4.0...v0.4.1) (2026-03-12)
 
 
