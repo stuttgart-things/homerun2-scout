@@ -55,6 +55,9 @@ schema Scout:
     # ScoutProfile CRD name to load at startup (empty = disabled)
     scoutProfileName: str = "default"
 
+    # TLS trust bundle (ConfigMap name containing trust-bundle.pem)
+    trustBundleConfigMap: str = ""
+
     # Extra environment variables
     extraEnvVars: {str:str} = {}
 

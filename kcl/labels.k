@@ -23,6 +23,7 @@ _redisearchIndex = option("config.redisearchIndex")
 _scoutInterval = option("config.scoutInterval")
 _authToken = option("config.authToken")
 _redisPassword = option("config.redisPassword")
+_trustBundleConfigMap = option("config.trustBundleConfigMap")
 _extraEnvVars = option("config.extraEnvVars") or {}
 _scoutProfileName = option("config.scoutProfileName")
 
@@ -64,6 +65,8 @@ config: schema.Scout = schema.Scout {
         authToken = _authToken
     if _redisPassword:
         redisPassword = _redisPassword
+    if _trustBundleConfigMap:
+        trustBundleConfigMap = _trustBundleConfigMap
     if _extraEnvVars:
         extraEnvVars = _extraEnvVars
     if _scoutProfileName:
