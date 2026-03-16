@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.6.1...v0.7.0) (2026-03-16)
+
+
+### Features
+
+* add TLS trust bundle support for custom CA certificates ([#49](https://github.com/stuttgart-things/homerun2-scout/issues/49)) ([470a06e](https://github.com/stuttgart-things/homerun2-scout/commit/470a06eaf0b3d6864dd55d2bcb9439a2ca96b93b))
+
 ## [0.6.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.6.0...v0.6.1) (2026-03-12)
 
 
