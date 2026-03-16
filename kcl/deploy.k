@@ -49,6 +49,12 @@ deployment = {
                                 name: "PORT"
                                 value: str(config.containerPort)
                             }
+                        ] + ([
+                            {
+                                name: "SSL_CERT_DIR"
+                                value: "/etc/ssl/custom"
+                            }
+                        ] if config.trustBundleConfigMap else []) + [
                             {
                                 name: "AUTH_TOKEN"
                                 valueFrom: {
@@ -146,7 +152,14 @@ deployment = {
                                 name: "tmp"
                                 mountPath: "/tmp"
                             }
-                        ]
+                        ] + ([
+                            {
+                                name: "trust-bundle"
+                                mountPath: "/etc/ssl/custom/trust-bundle.pem"
+                                subPath: "trust-bundle.pem"
+                                readOnly: True
+                            }
+                        ] if config.trustBundleConfigMap else [])
                     }
                 ]
                 securityContext: {
@@ -163,7 +176,15 @@ deployment = {
                         name: "tmp"
                         emptyDir: {}
                     }
-                ]
+                ] + ([
+                    {
+                        name: "trust-bundle"
+                        configMap: {
+                            name: config.trustBundleConfigMap
+                            optional: True
+                        }
+                    }
+                ] if config.trustBundleConfigMap else [])
                 affinity: {
                     podAntiAffinity: {
                         preferredDuringSchedulingIgnoredDuringExecution: [
