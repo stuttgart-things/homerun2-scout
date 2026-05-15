@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	charm.land/lipgloss/v2 v2.0.1
 	github.com/prometheus/client_golang v1.23.2
-	github.com/redis/go-redis/v9 v9.18.0
+	github.com/redis/go-redis/v9 v9.19.0
 	k8s.io/apimachinery v0.32.0
 	k8s.io/client-go v0.32.0
 )
