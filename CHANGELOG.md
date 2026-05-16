@@ -1,3 +1,10 @@
+# [0.8.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.7.1...v0.8.0) (2026-05-16)
+
+
+### Features
+
+* ship HTTPRoute in the kustomize OCI base (Option B for argocd[#116](https://github.com/stuttgart-things/homerun2-scout/issues/116)) ([481ab72](https://github.com/stuttgart-things/homerun2-scout/commit/481ab722f26614f863646c0b85cae68b2ea84cab)), closes [stuttgart-things/homerun2-omni-pitcher#125](https://github.com/stuttgart-things/homerun2-omni-pitcher/issues/125) [#55](https://github.com/stuttgart-things/homerun2-scout/issues/55)
+
 ## [0.7.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.7.0...v0.7.1) (2026-05-15)
 
 
