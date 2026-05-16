@@ -1,3 +1,12 @@
+## [0.8.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.8.0...v0.8.1) (2026-05-16)
+
+
+### Bug Fixes
+
+* **deps:** update module dagger.io/dagger to v0.20.8 ([ae4ce6b](https://github.com/stuttgart-things/homerun2-scout/commit/ae4ce6be906c9e0c66600066ff10e8007f96dc53))
+* **deps:** update module github.com/vektah/gqlparser/v2 to v2.5.33 ([f0587f0](https://github.com/stuttgart-things/homerun2-scout/commit/f0587f0be7a81527579d944e8bc8a4d68b936324))
+* **deps:** update opentelemetry-go monorepo ([22b5c2b](https://github.com/stuttgart-things/homerun2-scout/commit/22b5c2b041f4c84b86db85ea1a98c23dce81902a))
+
 # [0.8.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.7.1...v0.8.0) (2026-05-16)
 
 
