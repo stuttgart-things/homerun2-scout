@@ -1,3 +1,10 @@
+## [0.8.2](https://github.com/stuttgart-things/homerun2-scout/compare/v0.8.1...v0.8.2) (2026-05-17)
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes monorepo to v0.36.1 ([be088d3](https://github.com/stuttgart-things/homerun2-scout/commit/be088d37ff169021e4e5bb64b939df70f9cc6af2))
+
 ## [0.8.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.8.0...v0.8.1) (2026-05-16)
 
 
