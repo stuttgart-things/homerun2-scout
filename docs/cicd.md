@@ -2,13 +2,28 @@
 
 ## GitHub Actions Workflows
 
+### Core
+
 | Workflow | Trigger | Description |
 |----------|---------|-------------|
 | `build-test.yaml` | PR / push to main | Dagger lint + build + test |
-| `build-scan-image.yaml` | Push to main | ko build + Trivy scan |
+| `build-scan-image.yaml` | PR / push to main | ko build + Trivy scan; PR job tags `pr-<num>-<sha>` for preview envs, main job tags `:main` |
 | `release.yaml` | After image build / manual | Semantic release + stage image + push kustomize OCI |
-| `lint-repo.yaml` | PR / push to main | Repository linting |
 | `pages.yaml` | After release / manual | Deploy MkDocs to GitHub Pages |
+| `lint-repo.yaml` | PR / push to main | Repository linting |
+
+### PR-preview env
+
+These four together drive the per-PR ephemeral preview environment on `homerun2-dev` for PRs carrying the `preview` label.
+
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| `build-scan-image.yaml` (PR job) | PR opened/updated | ko image tagged `pr-<num>-<sha>` + `pr-<num>` consumed by the per-PR ArgoCD Application |
+| `push-kustomize-pr.yaml` | PR opened/updated | Kustomize OCI tagged `pr-<num>-<sha>` (renders `kcl/main.k` against `tests/kcl-deploy-profile.yaml`) |
+| `comment-preview-url.yaml` | PR opened/reopened | Sticky bot comment with the preview URL, namespace, and ArgoCD link |
+| `cleanup-pr-artifacts.yaml` | PR closed | Deletes both ghcr.io packages so version histories don't fill with PR debris |
+
+See [Preview Environments](preview-environments.md) for the full flow, AppSet anatomy, the functional-test verify Job, and troubleshooting.
 
 ## Dagger Functions
 
