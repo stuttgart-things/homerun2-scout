@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -28,16 +29,24 @@ type Aggregator struct {
 	onCycle CycleCallback
 	cancel  context.CancelFunc
 	done    chan struct{}
+
+	// indexReady is false until the RediSearch index is known to exist, and
+	// again whenever a query reports it missing. ensureIndex is EnsureIndex,
+	// swappable in tests.
+	indexReady  atomic.Bool
+	ensureIndex func(ctx context.Context) error
 }
 
 // New creates a new Aggregator.
 func New(client *redis.Client, index string, interval time.Duration) *Aggregator {
-	return &Aggregator{
+	a := &Aggregator{
 		client:   client,
 		index:    index,
 		interval: interval,
 		done:     make(chan struct{}),
 	}
+	a.ensureIndex = a.EnsureIndex
+	return a
 }
 
 // SetOnCycleCallback sets a callback invoked after each aggregation cycle.
@@ -49,16 +58,14 @@ func (a *Aggregator) SetOnCycleCallback(cb CycleCallback) {
 func (a *Aggregator) Start(ctx context.Context) {
 	ctx, a.cancel = context.WithCancel(ctx)
 
-	// Ensure the RediSearch index exists before querying
-	if err := a.EnsureIndex(ctx); err != nil {
-		slog.Warn("failed to ensure redisearch index", "index", a.index, "error", err)
-	}
-
-	// Run immediately on start
-	a.runOnce(ctx)
-
 	go func() {
 		defer close(a.done)
+
+		// The first cycle runs here rather than before Start returns: with
+		// Redis still starting, index creation and the queries held up the
+		// HTTP server behind them (#73).
+		a.runOnce(ctx)
+
 		ticker := time.NewTicker(a.interval)
 		defer ticker.Stop()
 
@@ -128,6 +135,8 @@ func (a *Aggregator) runOnce(ctx context.Context) {
 	slog.Debug("running aggregation cycle")
 	start := time.Now()
 
+	a.ensureIndexIfMissing(ctx)
+
 	summary := a.aggregateSummary(ctx)
 	systems := a.aggregateSystems(ctx)
 	alerts := a.aggregateAlerts(ctx)
@@ -172,4 +181,29 @@ func (a *Aggregator) runOnce(ctx context.Context) {
 		"totalAlerts", alerts.TotalAlerts,
 		"duration", duration,
 	)
+}
+
+// ensureIndexIfMissing creates the RediSearch index unless it is known to
+// exist. This used to happen once, in Start: a scout that started while Redis
+// was still coming up then failed every later cycle with "no such index" until
+// the pod was restarted, 15 hours on labda-dev-a (#73). A failure is logged and
+// retried on the next cycle.
+func (a *Aggregator) ensureIndexIfMissing(ctx context.Context) {
+	if a.indexReady.Load() {
+		return
+	}
+	if err := a.ensureIndex(ctx); err != nil {
+		slog.Warn("failed to ensure redisearch index, retrying next cycle", "index", a.index, "error", err)
+		return
+	}
+	a.indexReady.Store(true)
+}
+
+// noteQueryError marks the index missing when a query says so, so the next
+// cycle re-creates it: an index can disappear after scout has started, e.g.
+// when Redis restarts without it.
+func (a *Aggregator) noteQueryError(err error) {
+	if isMissingIndexError(err) && a.indexReady.Swap(false) {
+		slog.Warn("redisearch index is gone, re-creating it next cycle", "index", a.index)
+	}
 }

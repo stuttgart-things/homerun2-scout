@@ -253,7 +253,7 @@ Taskfile.yaml              # Task runner
 | `REDIS_ADDR` | Redis server address | `localhost` |
 | `REDIS_PORT` | Redis server port | `6379` |
 | `REDIS_PASSWORD` | Redis password | (empty) |
-| `REDISEARCH_INDEX` | RediSearch index name | `messages` |
+| `REDISEARCH_INDEX` | RediSearch index name; created when missing, re-created if it disappears | `messages` |
 | `SCOUT_INTERVAL` | Aggregation interval (Go duration) | `60s` |
 | `SCOUT_PROFILE_NAME` | ScoutProfile CR name to load at startup | (empty) |
 | `SCOUT_RETENTION_TTL` | Retention TTL — prunes expired JSON documents and trims the Redis Stream via `XTRIM MINID` | `48h` |

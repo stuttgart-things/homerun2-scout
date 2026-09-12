@@ -72,13 +72,16 @@ func main() {
 		Protocol: 2, // Force RESP2 for RediSearch FT.AGGREGATE compatibility
 	})
 
-	// Health check Redis
+	// Health check Redis. Informational only, and bounded: the aggregator
+	// retries the index and its queries every cycle (#73).
 	ctx := context.Background()
-	if err := rdb.Ping(ctx).Err(); err != nil {
+	pingCtx, cancelPing := context.WithTimeout(ctx, 5*time.Second)
+	if err := rdb.Ping(pingCtx).Err(); err != nil {
 		slog.Warn("redis not reachable at startup, aggregator will retry", "addr", cfg.RedisAddress(), "error", err)
 	} else {
 		slog.Info("redis connected", "addr", cfg.RedisAddress())
 	}
+	cancelPing()
 
 	// Start aggregator
 	agg := aggregator.New(rdb, cfg.RedisearchIndex, cfg.ScoutInterval)
