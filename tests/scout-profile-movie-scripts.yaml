@@ -10,7 +10,7 @@ spec:
     enabled: true
     ttl: 48h
   alerting:
-    pitcherURL: https://homerun2-omni-pitcher.movie-scripts2.sthings-vsphere.labul.sva.de/pitch
+    pitcherURL: https://homerun2-omni-pitcher.movie-scripts2.sthings-vsphere.labul.sva.de
     errorThreshold: 50
     criticalThreshold: 10
     cooldown: 5m

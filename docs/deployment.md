@@ -68,7 +68,7 @@ The deployment includes these scout-specific env vars in addition to the standar
 | `SCOUT_INTERVAL`           | deploy.k  | Aggregation polling interval                  |
 | `SCOUT_PROFILE_NAME`       | deploy.k  | ScoutProfile CR name to load at startup       |
 | `POD_NAMESPACE`            | deploy.k  | Injected via downward API (fieldRef)          |
-| `ALERT_PITCHER_URL`        | configmap | omni-pitcher `/pitch` endpoint                |
+| `ALERT_PITCHER_URL`        | configmap | omni-pitcher base URL (scout appends `/pitch`) |
 | `ALERT_ERROR_THRESHOLD`    | configmap | Error count threshold to trigger alert        |
 | `ALERT_CRITICAL_THRESHOLD` | configmap | Critical count threshold to trigger alert     |
 | `ALERT_COOLDOWN`           | configmap | Minimum time between alerts                   |
