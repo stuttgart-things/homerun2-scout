@@ -1,3 +1,10 @@
+# [0.9.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.8.3...v0.9.0) (2026-09-12)
+
+
+### Features
+
+* a /ready endpoint that reflects the RediSearch index and aggregation state ([c7f3460](https://github.com/stuttgart-things/homerun2-scout/commit/c7f346071ed6e619d486a148cee8b56e43c15cb0)), closes [#73](https://github.com/stuttgart-things/homerun2-scout/issues/73) [#75](https://github.com/stuttgart-things/homerun2-scout/issues/75)
+
 ## [0.8.3](https://github.com/stuttgart-things/homerun2-scout/compare/v0.8.2...v0.8.3) (2026-09-12)
 
 
