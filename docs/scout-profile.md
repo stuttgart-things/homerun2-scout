@@ -23,6 +23,14 @@ spec:
     errorThreshold: 50       # Error count that triggers a meta-alert
     criticalThreshold: 10    # Critical count that triggers a meta-alert
     cooldown: 5m             # Minimum time between alerts (Go duration)
+  digest:                    # Periodic digests, pitched through alerting.pitcherURL
+    enabled: true
+    timezone: Europe/Berlin  # IANA timezone the windows end in (default UTC)
+    hourly: false            # A digest of every full hour
+    dailyAt: "07:00"         # A digest of the last day at this local time
+    excludeSystems: []       # Systems left out of the counts
+    topSystems: 3            # Systems listed per digest
+    system: scout-digest     # System the digest is pitched as
 ```
 
 ## How It Works
@@ -139,3 +147,31 @@ Integer. Number of `critical`-severity messages that triggers a meta-alert. Over
 ### `spec.alerting.cooldown`
 
 Go duration string. Minimum time between successive alerts to avoid alert storms. Overrides `ALERT_COOLDOWN` env var.
+
+## Digest
+
+With `spec.digest.enabled`, scout pitches a summary of every finished window to omni-pitcher (`<alerting.pitcherURL>/pitch`, token from `ALERT_PITCHER_TOKEN`), so it reaches the same catchers as the messages it counts.
+
+- **Windows**: `hourly` ends on every full local hour; `dailyAt` ends every day at that local time and covers the calendar day before - 23 or 25 hours across a daylight saving change. Times are in `timezone`.
+- **Counts**: messages per severity (case-insensitive: `ERROR` and `error` are the same), errors and critical against the window before, and the `topSystems` with the most alerts, then the most messages. The digest's own `system` never counts, nor do `excludeSystems` - on a cluster whose k8s-pitcher pitches every Event, `kubernetes` is a candidate.
+- **Severity**: `error` when the window had a critical message; `warning` when it had more errors than the window before; `info` with errors, but not more; `success` otherwise.
+- **Once**: each window is claimed in Redis (`SET scout:digest:<schedule>:<end> NX`, kept 8 days) before it is pitched, so several replicas and restarts pitch it once. A failed pitch releases the claim and is retried the next minute.
+- **Late**: a digest is pitched up to 30 minutes (hourly) or 1 hour (daily) after its window ended; a scout that was down longer skips that window.
+- **Comparison**: the window before is compared only while retention still holds it; with `retention.ttl: 48h` a daily digest compares yesterday with the day before.
+- **Requires** the index to declare `timestamp_unix` NUMERIC (homerun-library v4.5.0+ writes it, scout v0.10.0+ declares it). An older index is reported in the log and by `/analytics/digest`, and no digest is pitched.
+
+Preview any time with `GET /analytics/digest?schedule=hourly|daily` (see [API Usage](api-usage.md)).
+
+### `spec.digest.*`
+
+| Field | Env var | Default |
+|---|---|---|
+| `enabled` | `DIGEST_ENABLED` | `false` |
+| `timezone` | `DIGEST_TIMEZONE` | `UTC` |
+| `hourly` | `DIGEST_HOURLY` | `false` |
+| `dailyAt` | `DIGEST_DAILY_AT` | (none) |
+| `excludeSystems` | `DIGEST_EXCLUDE_SYSTEMS` (comma-separated) | (none) |
+| `topSystems` | `DIGEST_TOP_SYSTEMS` | `3` |
+| `system` | `DIGEST_SYSTEM` | `scout-digest` |
+
+`enabled` and `hourly` in the CR only switch on: a CR without them leaves a digest enabled by env alone.

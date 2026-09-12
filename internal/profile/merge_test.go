@@ -93,3 +93,38 @@ func TestMerge_invalidDuration(t *testing.T) {
 		t.Error("expected error for invalid duration")
 	}
 }
+
+func TestMerge_digest(t *testing.T) {
+	cfg := baseConfig()
+	cfg.DigestTimezone, cfg.DigestTopSystems, cfg.DigestSystem = "UTC", 3, "scout-digest"
+	five := 5
+	p := &ScoutProfile{Retention: RetentionSpec{Enabled: true}, Digest: DigestSpec{
+		Enabled: true, Timezone: "Europe/Berlin", DailyAt: "07:00", ExcludeSystems: []string{"kubernetes"}, TopSystems: &five,
+	}}
+	if err := Merge(cfg, p); err != nil {
+		t.Fatal(err)
+	}
+	if !cfg.DigestEnabled || cfg.DigestHourly || cfg.DigestTimezone != "Europe/Berlin" || cfg.DigestDailyAt != "07:00" ||
+		cfg.DigestTopSystems != 5 || cfg.DigestSystem != "scout-digest" || len(cfg.DigestExcludeSystems) != 1 {
+		t.Errorf("merged digest = %+v", cfg)
+	}
+
+	// A profile without a digest block leaves an env-enabled digest alone.
+	env := baseConfig()
+	env.DigestEnabled, env.DigestHourly, env.DigestTopSystems = true, true, 3
+	if err := Merge(env, &ScoutProfile{Retention: RetentionSpec{Enabled: true}}); err != nil {
+		t.Fatal(err)
+	}
+	if !env.DigestEnabled || !env.DigestHourly || env.DigestTopSystems != 3 {
+		t.Errorf("empty digest block changed the env config: %+v", env)
+	}
+
+	// topSystems: 0 is a choice, not an unset field.
+	zero := 0
+	z := baseConfig()
+	z.DigestTopSystems = 3
+	_ = Merge(z, &ScoutProfile{Digest: DigestSpec{TopSystems: &zero}})
+	if z.DigestTopSystems != 0 {
+		t.Errorf("topSystems 0 = %d", z.DigestTopSystems)
+	}
+}

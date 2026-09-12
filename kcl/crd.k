@@ -71,6 +71,41 @@ scoutProfileCRD = {
                                             }
                                         }
                                     }
+                                    digest: {
+                                        type: "object"
+                                        description: "Periodic digest pitched through alerting.pitcherURL"
+                                        properties: {
+                                            enabled: {
+                                                type: "boolean"
+                                                description: "Pitch digests"
+                                            }
+                                            timezone: {
+                                                type: "string"
+                                                description: "IANA timezone the windows end in (default UTC), e.g. Europe/Berlin"
+                                            }
+                                            hourly: {
+                                                type: "boolean"
+                                                description: "Pitch a digest of every full hour"
+                                            }
+                                            dailyAt: {
+                                                type: "string"
+                                                description: "Pitch a digest of the last day at this local time (HH:MM)"
+                                            }
+                                            excludeSystems: {
+                                                type: "array"
+                                                items: {type: "string"}
+                                                description: "Systems left out of the counts; the digest's own system always is"
+                                            }
+                                            topSystems: {
+                                                type: "integer"
+                                                description: "Systems listed in the digest (default 3)"
+                                            }
+                                            system: {
+                                                type: "string"
+                                                description: "System the digest is pitched as (default scout-digest)"
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

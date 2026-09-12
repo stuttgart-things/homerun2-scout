@@ -92,6 +92,34 @@ Response:
 }
 ```
 
+## Digest
+
+Builds the digest of the window ending now - the hour (`?schedule=hourly`) or the day (`?schedule=daily`, default) - exactly as the periodic digest would pitch it, without pitching it. It works whether or not `digest.enabled` is set, and needs the index to declare `timestamp_unix` NUMERIC (homerun-library v4.5.0+); otherwise it answers 503 with the fix.
+
+```bash
+curl "http://localhost:8080/analytics/digest?schedule=hourly" \
+  -H "Authorization: Bearer $AUTH_TOKEN"
+```
+
+Response (example):
+
+```json
+{
+  "schedule": "hourly",
+  "message": {
+    "title": "1h: 42 msgs 3 err 0 crit",
+    "message": "hourly digest 2026-09-12 14:37 - 2026-09-12 15:37 (Europe/Berlin)\nMessages: 42 (previous 30, +12)\nErrors: 3 (previous 1, +2), critical: 0 (previous 0, +0)\nSeverities: error 3, success 20, info 19\nTop systems: github 5 (3 alerts), kubernetes 37 (0 alerts)",
+    "severity": "warning",
+    "author": "homerun2-scout",
+    "system": "scout-digest",
+    "tags": "digest,hourly",
+    "timestamp": "2026-09-12T13:37:00Z"
+  },
+  "current": {"start": "...", "end": "...", "total": 42, "severities": {"error": 3, "success": 20, "info": 19}, "topSystems": [...]},
+  "previous": {"...": "..."}
+}
+```
+
 ## Error Responses
 
 ### 401 Unauthorized

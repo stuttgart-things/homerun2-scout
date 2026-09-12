@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -27,6 +28,15 @@ type Config struct {
 	AlertCriticalThreshold int64
 	AlertCooldown          time.Duration
 	ScoutProfileName       string
+
+	// Digest pitches periodic summaries through omni-pitcher (AlertPitcherURL).
+	DigestEnabled        bool
+	DigestTimezone       string
+	DigestHourly         bool
+	DigestDailyAt        string
+	DigestExcludeSystems []string
+	DigestTopSystems     int
+	DigestSystem         string
 }
 
 // LoadConfig reads configuration from environment variables with sensible defaults.
@@ -84,7 +94,31 @@ func LoadConfig() (*Config, error) {
 	}
 	cfg.AlertCooldown = cooldown
 
+	cfg.DigestEnabled = getEnv("DIGEST_ENABLED", "false") == "true"
+	cfg.DigestTimezone = getEnv("DIGEST_TIMEZONE", "UTC")
+	cfg.DigestHourly = getEnv("DIGEST_HOURLY", "false") == "true"
+	cfg.DigestDailyAt = getEnv("DIGEST_DAILY_AT", "")
+	cfg.DigestExcludeSystems = splitList(getEnv("DIGEST_EXCLUDE_SYSTEMS", ""))
+	cfg.DigestSystem = getEnv("DIGEST_SYSTEM", "scout-digest")
+	topStr := getEnv("DIGEST_TOP_SYSTEMS", "3")
+	top, err := strconv.Atoi(topStr)
+	if err != nil || top < 0 {
+		return nil, fmt.Errorf("invalid DIGEST_TOP_SYSTEMS %q: must be a non-negative integer", topStr)
+	}
+	cfg.DigestTopSystems = top
+
 	return cfg, nil
+}
+
+// splitList splits a comma-separated list, dropping blanks.
+func splitList(v string) []string {
+	var out []string
+	for _, item := range strings.Split(v, ",") {
+		if item = strings.TrimSpace(item); item != "" {
+			out = append(out, item)
+		}
+	}
+	return out
 }
 
 // RedisAddress returns the full Redis address (host:port).
