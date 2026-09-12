@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+
+	"github.com/stuttgart-things/homerun2-scout/internal/aggregator"
 )
 
 // Cleaner periodically prunes old entries from a RediSearch index and Redis Stream based on TTL.
@@ -66,20 +68,101 @@ func (c *Cleaner) Stop() {
 	slog.Info("retention cleaner stopped")
 }
 
+// batchSize is how many documents one FT.SEARCH of the cleanup returns.
+const batchSize = 500
+
 // cleanupDocuments removes JSON documents from the RediSearch index that are older than the TTL.
-// Documents store timestamps as ISO 8601 strings, so we fetch them and compare in Go.
+//
+// With a NUMERIC timestamp_unix in the index (homerun-library v4.5.0+ writes it)
+// the expired documents are one range query away. Documents written before
+// that carry only the RFC3339 string, which the index cannot compare: they are
+// fetched and compared in Go, as every document was before. An index without
+// the attribute would answer the range query with nothing - no error - so the
+// attribute is checked first and its absence means the Go path for everything.
 func (c *Cleaner) cleanupDocuments(ctx context.Context) {
 	cutoff := time.Now().Add(-c.ttl)
 	slog.Debug("running document retention cleanup", "cutoff", cutoff.Format(time.RFC3339))
 
-	// Fetch documents with their timestamp field, paginated
+	legacyQuery := "*"
+	totalDeleted := 0
+	if c.indexHasNumericTimestamp(ctx) {
+		totalDeleted += c.cleanupByRange(ctx, cutoff)
+		legacyQuery = withoutNumericTimestampQuery()
+	}
+	totalDeleted += c.cleanupByParsedTimestamp(ctx, legacyQuery, cutoff)
+
+	if totalDeleted > 0 {
+		slog.Info("document retention cleanup complete", "deleted", totalDeleted)
+	} else {
+		slog.Debug("document retention cleanup: no expired entries")
+	}
+}
+
+// indexHasNumericTimestamp reports whether the index declares timestamp_unix
+// NUMERIC. A failed FT.INFO counts as no, which keeps the Go path.
+func (c *Cleaner) indexHasNumericTimestamp(ctx context.Context) bool {
+	info, err := c.client.Do(ctx, "FT.INFO", c.index).Result()
+	if err != nil {
+		slog.Warn("retention: FT.INFO failed, comparing timestamps in Go", "error", err)
+		return false
+	}
+	return aggregator.HasNumericAttribute(info, aggregator.TimestampUnixField)
+}
+
+// expiredQuery matches documents whose event time is before cutoff.
+func expiredQuery(cutoff time.Time) string {
+	return fmt.Sprintf("@%s:[-inf (%d]", aggregator.TimestampUnixField, cutoff.Unix())
+}
+
+// withoutNumericTimestampQuery matches documents that have no timestamp_unix -
+// those written before homerun-library v4.5.0.
+func withoutNumericTimestampQuery() string {
+	return fmt.Sprintf("-@%s:[-inf +inf]", aggregator.TimestampUnixField)
+}
+
+// cleanupByRange deletes the documents expiredQuery matches, a batch at a time.
+// Deleted documents leave the index, so every batch starts at offset 0; a batch
+// that deletes nothing ends the loop rather than fetching it again.
+func (c *Cleaner) cleanupByRange(ctx context.Context, cutoff time.Time) int {
+	total := 0
+	for {
+		result, err := c.client.Do(ctx,
+			"FT.SEARCH", c.index, expiredQuery(cutoff),
+			"NOCONTENT",
+			"LIMIT", "0", strconv.Itoa(batchSize),
+			"TIMEOUT", "30000",
+		).Result()
+		if err != nil {
+			slog.Warn("retention range search failed", "error", err)
+			return total
+		}
+
+		keys := parseSearchKeys(result)
+		deleted := 0
+		for _, key := range keys {
+			if err := c.client.Del(ctx, key).Err(); err != nil {
+				slog.Warn("retention: failed to delete key", "key", key, "error", err)
+				continue
+			}
+			deleted++
+		}
+		total += deleted
+
+		if len(keys) < batchSize || deleted == 0 {
+			return total
+		}
+	}
+}
+
+// cleanupByParsedTimestamp fetches the documents query matches with their RFC3339
+// timestamp, paginated, and deletes those before cutoff.
+func (c *Cleaner) cleanupByParsedTimestamp(ctx context.Context, query string, cutoff time.Time) int {
 	offset := 0
-	batchSize := 500
 	totalDeleted := 0
 
 	for {
 		args := []any{
-			"FT.SEARCH", c.index, "*",
+			"FT.SEARCH", c.index, query,
 			"RETURN", "1", "timestamp",
 			"LIMIT", strconv.Itoa(offset), strconv.Itoa(batchSize),
 			"TIMEOUT", "30000",
@@ -88,7 +171,7 @@ func (c *Cleaner) cleanupDocuments(ctx context.Context) {
 		result, err := c.client.Do(ctx, args...).Result()
 		if err != nil {
 			slog.Warn("retention cleanup search failed", "error", err)
-			return
+			return totalDeleted
 		}
 
 		entries := parseSearchEntries(result)
@@ -126,11 +209,7 @@ func (c *Cleaner) cleanupDocuments(ctx context.Context) {
 		offset += len(entries) - deleted
 	}
 
-	if totalDeleted > 0 {
-		slog.Info("document retention cleanup complete", "deleted", totalDeleted)
-	} else {
-		slog.Debug("document retention cleanup: no expired entries")
-	}
+	return totalDeleted
 }
 
 // cleanupStream trims Redis Stream entries older than the TTL using XTRIM MINID.
