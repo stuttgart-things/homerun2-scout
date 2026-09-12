@@ -64,7 +64,7 @@ curl http://localhost:8080/analytics/summary \
 | `PORT` | `8080` | HTTP server port |
 | `LOG_FORMAT` | `json` | Log format (`json` or `text`) |
 | `LOG_LEVEL` | `info` | Log level (`debug`, `info`, `warn`, `error`) |
-| `ALERT_PITCHER_URL` | (empty) | omni-pitcher `/pitch` endpoint |
+| `ALERT_PITCHER_URL` | (empty) | omni-pitcher base URL; scout posts to `<url>/pitch` |
 | `ALERT_PITCHER_TOKEN` | (empty) | Bearer token for omni-pitcher |
 | `ALERT_ERROR_THRESHOLD` | `0` | Error count threshold to trigger alert |
 | `ALERT_CRITICAL_THRESHOLD` | `0` | Critical count threshold to trigger alert |

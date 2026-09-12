@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -59,7 +60,7 @@ func (a *Alerter) Check(ctx context.Context, summary *models.Summary, alerts *mo
 	}
 
 	// Check error threshold
-	if errorCount, ok := summary.SeverityCounts["error"]; ok && a.thresholds.ErrorThreshold > 0 {
+	if errorCount, ok := severityCount(summary.SeverityCounts, "error"); ok && a.thresholds.ErrorThreshold > 0 {
 		if errorCount >= a.thresholds.ErrorThreshold {
 			a.sendAlert(ctx, "error-threshold", PitchRequest{
 				Title:    "Scout: Error threshold exceeded",
@@ -73,7 +74,7 @@ func (a *Alerter) Check(ctx context.Context, summary *models.Summary, alerts *mo
 	}
 
 	// Check critical threshold
-	if criticalCount, ok := summary.SeverityCounts["critical"]; ok && a.thresholds.CriticalThreshold > 0 {
+	if criticalCount, ok := severityCount(summary.SeverityCounts, "critical"); ok && a.thresholds.CriticalThreshold > 0 {
 		if criticalCount >= a.thresholds.CriticalThreshold {
 			a.sendAlert(ctx, "critical-threshold", PitchRequest{
 				Title:    "Scout: Critical threshold exceeded",
@@ -100,6 +101,22 @@ func (a *Alerter) Check(ctx context.Context, summary *models.Summary, alerts *mo
 			})
 		}
 	}
+}
+
+// severityCount sums the counts of severity in any letter case. The
+// aggregator groups by the severity as pitched, and RediSearch GROUPBY keeps
+// the case: pitchers send ERROR as well as error, and both are the same
+// severity to the catchers.
+func severityCount(counts map[string]int64, severity string) (int64, bool) {
+	var total int64
+	found := false
+	for name, n := range counts {
+		if strings.EqualFold(name, severity) {
+			total += n
+			found = true
+		}
+	}
+	return total, found
 }
 
 func (a *Alerter) sendAlert(ctx context.Context, key string, req PitchRequest) {

@@ -18,7 +18,7 @@ spec:
     enabled: true           # Enable periodic cleanup of expired JSON docs + Redis Stream trimming
     ttl: 48h                # Max age of entries to keep (Go duration, default: 48h)
   alerting:
-    pitcherURL: https://...  # omni-pitcher /pitch endpoint
+    pitcherURL: https://...  # omni-pitcher base URL; scout appends /pitch
     pitcherToken: ""         # Bearer token — prefer ALERT_PITCHER_TOKEN env var
     errorThreshold: 50       # Error count that triggers a meta-alert
     criticalThreshold: 10    # Critical count that triggers a meta-alert
@@ -66,7 +66,7 @@ spec:
     enabled: true
     ttl: 72h
   alerting:
-    pitcherURL: https://homerun2-omni-pitcher.movie-scripts2.sthings-vsphere.labul.sva.de/pitch
+    pitcherURL: https://homerun2-omni-pitcher.movie-scripts2.sthings-vsphere.labul.sva.de
     errorThreshold: 20
     criticalThreshold: 5
     cooldown: 10m
@@ -99,7 +99,7 @@ Leave `SCOUT_PROFILE_NAME` unset — profile loading is skipped entirely and all
 
 ```bash
 # No SCOUT_PROFILE_NAME → env vars only
-export ALERT_PITCHER_URL=http://localhost:8081/pitch
+export ALERT_PITCHER_URL=http://localhost:8081
 export ALERT_ERROR_THRESHOLD=50
 export ALERT_CRITICAL_THRESHOLD=10
 export SCOUT_RETENTION_TTL=48h
@@ -122,7 +122,7 @@ Go duration string (e.g. `48h` = 2 days). Overrides `SCOUT_RETENTION_TTL` env va
 
 ### `spec.alerting.pitcherURL`
 
-Full URL of the omni-pitcher `/pitch` endpoint. Overrides `ALERT_PITCHER_URL` env var.
+Base URL of omni-pitcher, without `/pitch`: scout posts meta-alerts to `<pitcherURL>/pitch`. Overrides `ALERT_PITCHER_URL` env var.
 
 ### `spec.alerting.pitcherToken`
 
