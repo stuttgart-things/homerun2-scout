@@ -1,3 +1,10 @@
+# [0.10.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.9.1...v0.10.0) (2026-09-12)
+
+
+### Features
+
+* NUMERIC timestamp_unix in the index, retention by range query ([#79](https://github.com/stuttgart-things/homerun2-scout/issues/79)) ([ac6b213](https://github.com/stuttgart-things/homerun2-scout/commit/ac6b213c3876397172e222b6bcdcd3c2759de63f)), closes [#78](https://github.com/stuttgart-things/homerun2-scout/issues/78)
+
 ## [0.9.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.9.0...v0.9.1) (2026-09-12)
 
 
