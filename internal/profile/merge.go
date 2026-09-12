@@ -44,6 +44,8 @@ func Merge(cfg *config.Config, p *ScoutProfile) error {
 	if p.Alerting.CriticalThreshold != 0 {
 		cfg.AlertCriticalThreshold = p.Alerting.CriticalThreshold
 	}
+	mergeDigest(cfg, p.Digest)
+
 	if p.Alerting.Cooldown != "" {
 		d, err := time.ParseDuration(p.Alerting.Cooldown)
 		if err != nil {
@@ -53,4 +55,30 @@ func Merge(cfg *config.Config, p *ScoutProfile) error {
 	}
 
 	return nil
+}
+
+// mergeDigest applies the set digest fields. enabled and hourly only switch on:
+// a profile without a digest block leaves a digest enabled by env alone.
+func mergeDigest(cfg *config.Config, d DigestSpec) {
+	if d.Enabled {
+		cfg.DigestEnabled = true
+	}
+	if d.Hourly {
+		cfg.DigestHourly = true
+	}
+	if d.Timezone != "" {
+		cfg.DigestTimezone = d.Timezone
+	}
+	if d.DailyAt != "" {
+		cfg.DigestDailyAt = d.DailyAt
+	}
+	if len(d.ExcludeSystems) > 0 {
+		cfg.DigestExcludeSystems = d.ExcludeSystems
+	}
+	if d.TopSystems != nil {
+		cfg.DigestTopSystems = *d.TopSystems
+	}
+	if d.System != "" {
+		cfg.DigestSystem = d.System
+	}
 }

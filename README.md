@@ -14,6 +14,7 @@ A Go microservice that periodically analyzes messages indexed in RediSearch and 
 | `/analytics/summary` | `GET` | Bearer token | Severity counts, total messages |
 | `/analytics/systems` | `GET` | Bearer token | Per-system message counts (top 20) |
 | `/analytics/alerts` | `GET` | Bearer token | Alert frequency, top alerting systems |
+| `/analytics/digest` | `GET` | Bearer token | Digest of the window ending now (`?schedule=hourly\|daily`), as it would be pitched; not pitched |
 | `/metrics` | `GET` | None | Prometheus metrics ([Grafana integration](https://stuttgart-things.github.io/homerun2-scout/grafana/)) |
 
 <details>
@@ -154,6 +155,12 @@ spec:
     errorThreshold: 50
     criticalThreshold: 10
     cooldown: 5m
+  digest:                     # pitched through alerting.pitcherURL
+    enabled: true
+    timezone: Europe/Berlin
+    hourly: false
+    dailyAt: "07:00"
+    excludeSystems: [kubernetes]
 ```
 
 ```bash
@@ -228,6 +235,7 @@ main.go                    # Entrypoint, routing, aggregator, graceful shutdown
 internal/
   aggregator/              # Periodic FT.AGGREGATE queries, result caching
   alerter/                 # Threshold alerting via omni-pitcher
+  digest/                  # Hourly/daily digests pitched via omni-pitcher
   banner/                  # Startup banner (lipgloss)
   config/                  # Env-based config loading, slog setup
   handlers/                # HTTP handlers (analytics, health)
@@ -267,6 +275,13 @@ Taskfile.yaml              # Task runner
 | `ALERT_ERROR_THRESHOLD` | Error count threshold to trigger alert | `0` |
 | `ALERT_CRITICAL_THRESHOLD` | Critical count threshold to trigger alert | `0` |
 | `ALERT_COOLDOWN` | Minimum time between alerts | `5m` |
+| `DIGEST_ENABLED` | Pitch periodic digests through `ALERT_PITCHER_URL` | `false` |
+| `DIGEST_HOURLY` | A digest of every full hour | `false` |
+| `DIGEST_DAILY_AT` | A digest of the last day at this local time (`HH:MM`) | (empty) |
+| `DIGEST_TIMEZONE` | IANA timezone the windows end in | `UTC` |
+| `DIGEST_EXCLUDE_SYSTEMS` | Comma-separated systems left out of the counts | (empty) |
+| `DIGEST_TOP_SYSTEMS` | Systems listed in a digest | `3` |
+| `DIGEST_SYSTEM` | System a digest is pitched as (always excluded from the counts) | `scout-digest` |
 
 > When `SCOUT_PROFILE_NAME` is set, the corresponding `ScoutProfile` CR overrides these env var values at startup. See [ScoutProfile docs](https://stuttgart-things.github.io/homerun2-scout/scout-profile/) for the full schema.
 

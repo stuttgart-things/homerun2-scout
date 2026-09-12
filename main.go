@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	_ "time/tzdata" // the digest's timezone: the chainguard static image ships no zoneinfo
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/redis/go-redis/v9"
@@ -15,6 +16,7 @@ import (
 	"github.com/stuttgart-things/homerun2-scout/internal/alerter"
 	"github.com/stuttgart-things/homerun2-scout/internal/banner"
 	"github.com/stuttgart-things/homerun2-scout/internal/config"
+	"github.com/stuttgart-things/homerun2-scout/internal/digest"
 	"github.com/stuttgart-things/homerun2-scout/internal/handlers"
 	"github.com/stuttgart-things/homerun2-scout/internal/middleware"
 	"github.com/stuttgart-things/homerun2-scout/internal/profile"
@@ -106,6 +108,19 @@ func main() {
 		cleaner.Start(ctx)
 	}
 
+	// Digest: built for /analytics/digest in any case, pitched only when enabled.
+	digestRunner := newDigestRunner(cfg, rdb)
+	if cfg.DigestEnabled {
+		switch {
+		case cfg.AlertPitcherURL == "":
+			slog.Warn("digest enabled but no alerting.pitcherURL / ALERT_PITCHER_URL: nothing to pitch to")
+		case len(digestSchedules(cfg)) == 0:
+			slog.Warn("digest enabled but no schedule: set digest.hourly or digest.dailyAt")
+		default:
+			digestRunner.Start(ctx)
+		}
+	}
+
 	// Setup routes
 	mux := http.NewServeMux()
 
@@ -130,6 +145,7 @@ func main() {
 	mux.HandleFunc("/analytics/summary", authWrap(handlers.NewSummaryHandler(agg)))
 	mux.HandleFunc("/analytics/systems", authWrap(handlers.NewSystemsHandler(agg)))
 	mux.HandleFunc("/analytics/alerts", authWrap(handlers.NewAlertsHandler(agg)))
+	mux.HandleFunc("/analytics/digest", authWrap(handlers.NewDigestHandler(digestRunner)))
 
 	// Prometheus metrics endpoint (no auth)
 	mux.Handle("/metrics", promhttp.Handler())
@@ -160,7 +176,8 @@ func main() {
 		cleaner.Stop()
 	}
 
-	// Stop aggregator
+	// Stop digest and aggregator
+	digestRunner.Stop()
 	agg.Stop()
 
 	// Shutdown HTTP server
@@ -174,4 +191,47 @@ func main() {
 	_ = rdb.Close()
 
 	slog.Info("shutdown complete")
+}
+
+// digestSchedules returns the configured digest schedules; an invalid daily
+// time is logged and left out.
+func digestSchedules(cfg *config.Config) []digest.Schedule {
+	var schedules []digest.Schedule
+	if cfg.DigestHourly {
+		schedules = append(schedules, digest.Hourly())
+	}
+	if cfg.DigestDailyAt != "" {
+		daily, err := digest.Daily(cfg.DigestDailyAt)
+		if err != nil {
+			slog.Warn("digest: daily schedule left out", "error", err)
+		} else {
+			schedules = append(schedules, daily)
+		}
+	}
+	return schedules
+}
+
+// newDigestRunner builds the digest runner from cfg.
+func newDigestRunner(cfg *config.Config, rdb *redis.Client) *digest.Runner {
+	loc, err := time.LoadLocation(cfg.DigestTimezone)
+	if err != nil {
+		slog.Warn("digest: unknown timezone, using UTC", "timezone", cfg.DigestTimezone, "error", err)
+		loc = time.UTC
+	}
+	retention := cfg.RetentionTTL
+	if !cfg.RetentionEnabled {
+		retention = 0
+	}
+	return digest.NewRunner(digest.Config{
+		Schedules:  digestSchedules(cfg),
+		Location:   loc,
+		Exclude:    cfg.DigestExcludeSystems,
+		TopSystems: cfg.DigestTopSystems,
+		System:     cfg.DigestSystem,
+		Retention:  retention,
+	},
+		digest.RedisQuerier{Client: rdb, Index: cfg.RedisearchIndex},
+		digest.RedisStore{Client: rdb},
+		digest.HTTPPitcher{URL: cfg.AlertPitcherURL, Token: cfg.AlertPitcherToken},
+	)
 }

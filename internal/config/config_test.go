@@ -42,6 +42,42 @@ func TestLoadConfigDefaults(t *testing.T) {
 	}
 }
 
+func TestLoadConfigDigest(t *testing.T) {
+	for _, key := range []string{"DIGEST_ENABLED", "DIGEST_TIMEZONE", "DIGEST_HOURLY", "DIGEST_DAILY_AT", "DIGEST_EXCLUDE_SYSTEMS", "DIGEST_TOP_SYSTEMS", "DIGEST_SYSTEM"} {
+		t.Setenv(key, "")
+	}
+	cfg, err := LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.DigestEnabled || cfg.DigestHourly || cfg.DigestDailyAt != "" || cfg.DigestTimezone != "UTC" ||
+		cfg.DigestTopSystems != 3 || cfg.DigestSystem != "scout-digest" || cfg.DigestExcludeSystems != nil {
+		t.Errorf("digest defaults = %+v", cfg)
+	}
+
+	t.Setenv("DIGEST_ENABLED", "true")
+	t.Setenv("DIGEST_HOURLY", "true")
+	t.Setenv("DIGEST_DAILY_AT", "07:00")
+	t.Setenv("DIGEST_TIMEZONE", "Europe/Berlin")
+	t.Setenv("DIGEST_EXCLUDE_SYSTEMS", " kubernetes, ,smoke-test ")
+	t.Setenv("DIGEST_TOP_SYSTEMS", "5")
+	t.Setenv("DIGEST_SYSTEM", "digest")
+	cfg, err = LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !cfg.DigestEnabled || !cfg.DigestHourly || cfg.DigestDailyAt != "07:00" || cfg.DigestTimezone != "Europe/Berlin" ||
+		cfg.DigestTopSystems != 5 || cfg.DigestSystem != "digest" ||
+		len(cfg.DigestExcludeSystems) != 2 || cfg.DigestExcludeSystems[0] != "kubernetes" || cfg.DigestExcludeSystems[1] != "smoke-test" {
+		t.Errorf("digest from env = %+v", cfg)
+	}
+
+	t.Setenv("DIGEST_TOP_SYSTEMS", "-1")
+	if _, err := LoadConfig(); err == nil {
+		t.Error("a negative DIGEST_TOP_SYSTEMS must be rejected")
+	}
+}
+
 func TestLoadConfigFromEnv(t *testing.T) {
 	t.Setenv("REDIS_ADDR", "redis-host")
 	t.Setenv("REDIS_PORT", "6380")

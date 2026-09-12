@@ -6,6 +6,19 @@ type ScoutProfile struct {
 	ScoutInterval string        `json:"scoutInterval,omitempty"`
 	Retention     RetentionSpec `json:"retention"`
 	Alerting      AlertingSpec  `json:"alerting"`
+	Digest        DigestSpec    `json:"digest"`
+}
+
+// DigestSpec configures the periodic digest pitched through
+// alerting.pitcherURL.
+type DigestSpec struct {
+	Enabled        bool     `json:"enabled,omitempty"`
+	Timezone       string   `json:"timezone,omitempty"`
+	Hourly         bool     `json:"hourly,omitempty"`
+	DailyAt        string   `json:"dailyAt,omitempty"`
+	ExcludeSystems []string `json:"excludeSystems,omitempty"`
+	TopSystems     *int     `json:"topSystems,omitempty"`
+	System         string   `json:"system,omitempty"`
 }
 
 // RetentionSpec configures RediSearch index cleanup.
