@@ -35,6 +35,15 @@ type Aggregator struct {
 	// swappable in tests.
 	indexReady  atomic.Bool
 	ensureIndex func(ctx context.Context) error
+
+	// Readiness bookkeeping for /ready (#75). cycleErrors counts the failed
+	// queries of the running cycle; lastSuccess is the unix-nano time of the
+	// last cycle without any, 0 before the first.
+	cycleErrors         atomic.Int64
+	lastSuccess         atomic.Int64
+	consecutiveFailures atomic.Int64
+	lastError           atomic.Value // string
+	now                 func() time.Time
 }
 
 // New creates a new Aggregator.
@@ -44,6 +53,7 @@ func New(client *redis.Client, index string, interval time.Duration) *Aggregator
 		index:    index,
 		interval: interval,
 		done:     make(chan struct{}),
+		now:      time.Now,
 	}
 	a.ensureIndex = a.EnsureIndex
 	return a
@@ -135,6 +145,7 @@ func (a *Aggregator) runOnce(ctx context.Context) {
 	slog.Debug("running aggregation cycle")
 	start := time.Now()
 
+	a.cycleErrors.Store(0)
 	a.ensureIndexIfMissing(ctx)
 
 	summary := a.aggregateSummary(ctx)
@@ -170,6 +181,8 @@ func (a *Aggregator) runOnce(ctx context.Context) {
 		metrics.TopAlertingSystemCount.WithLabelValues(sc.System).Set(float64(sc.Count))
 	}
 
+	a.recordCycle()
+
 	// Invoke callback if set
 	if a.onCycle != nil {
 		a.onCycle(ctx, summary, alerts)
@@ -194,6 +207,8 @@ func (a *Aggregator) ensureIndexIfMissing(ctx context.Context) {
 	}
 	if err := a.ensureIndex(ctx); err != nil {
 		slog.Warn("failed to ensure redisearch index, retrying next cycle", "index", a.index, "error", err)
+		a.cycleErrors.Add(1)
+		a.lastError.Store(err.Error())
 		return
 	}
 	a.indexReady.Store(true)
@@ -203,7 +218,62 @@ func (a *Aggregator) ensureIndexIfMissing(ctx context.Context) {
 // cycle re-creates it: an index can disappear after scout has started, e.g.
 // when Redis restarts without it.
 func (a *Aggregator) noteQueryError(err error) {
+	if err == nil {
+		return
+	}
+	a.cycleErrors.Add(1)
+	a.lastError.Store(err.Error())
 	if isMissingIndexError(err) && a.indexReady.Swap(false) {
 		slog.Warn("redisearch index is gone, re-creating it next cycle", "index", a.index)
 	}
+}
+
+// recordCycle closes a cycle for readiness: without failed queries (and with the
+// index in place) it counts as a success, otherwise as one more failure.
+func (a *Aggregator) recordCycle() {
+	if a.cycleErrors.Load() == 0 && a.indexReady.Load() {
+		a.lastSuccess.Store(a.now().UnixNano())
+		a.consecutiveFailures.Store(0)
+		a.lastError.Store("") // a healthy cycle should not read like a broken one
+		return
+	}
+	a.consecutiveFailures.Add(1)
+}
+
+// staleAfter is how long the last successful cycle may lie back before scout
+// stops reporting ready: three intervals, so one failed cycle (a Redis blip)
+// does not take scout out of its Service, while an aggregation that has stopped
+// working does within minutes rather than never (#75).
+func (a *Aggregator) staleAfter() time.Duration {
+	return 3 * a.interval
+}
+
+// Readiness reports whether scout can currently aggregate, for /ready.
+func (a *Aggregator) Readiness() (bool, models.ReadinessResponse) {
+	resp := models.ReadinessResponse{
+		Status:              "ready",
+		IndexReady:          a.indexReady.Load(),
+		ConsecutiveFailures: a.consecutiveFailures.Load(),
+		StaleAfter:          a.staleAfter().String(),
+	}
+	if e, ok := a.lastError.Load().(string); ok {
+		resp.LastError = e
+	}
+	last := a.lastSuccess.Load()
+	if last != 0 {
+		resp.LastSuccess = time.Unix(0, last).UTC().Format(time.RFC3339)
+	}
+
+	switch {
+	case !resp.IndexReady:
+		resp.Reason = "redisearch index not ready"
+	case last == 0:
+		resp.Reason = "no successful aggregation cycle yet"
+	case a.now().Sub(time.Unix(0, last)) > a.staleAfter():
+		resp.Reason = "last successful aggregation cycle is older than staleAfter"
+	default:
+		return true, resp
+	}
+	resp.Status = "not ready"
+	return false, resp
 }

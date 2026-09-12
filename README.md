@@ -9,7 +9,8 @@ A Go microservice that periodically analyzes messages indexed in RediSearch and 
 
 | Endpoint | Method | Auth | Description |
 |----------|--------|------|-------------|
-| `/health` | `GET` | None | Health check (returns version, commit, uptime) |
+| `/health` | `GET` | None | Health check (returns version, commit, uptime); liveness probe |
+| `/ready` | `GET` | None | 200 while the RediSearch index exists and an aggregation cycle succeeded within 3 × `SCOUT_INTERVAL`, else 503 with `reason`, `lastSuccess`, `lastError`, `consecutiveFailures`; readiness probe |
 | `/analytics/summary` | `GET` | Bearer token | Severity counts, total messages |
 | `/analytics/systems` | `GET` | Bearer token | Per-system message counts (top 20) |
 | `/analytics/alerts` | `GET` | Bearer token | Alert frequency, top alerting systems |

@@ -129,9 +129,13 @@ deployment = {
                             timeoutSeconds: 5
                             failureThreshold: 3
                         }
+                        # Readiness follows aggregation (#75): 503 while the index
+                        # is missing or no cycle succeeded within 3 intervals.
+                        # Liveness stays on /health, so a Redis outage takes scout
+                        # out of the Service without restarting it.
                         readinessProbe: {
                             httpGet: {
-                                path: "/health"
+                                path: "/ready"
                                 port: "http"
                             }
                             initialDelaySeconds: 5

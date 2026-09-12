@@ -22,6 +22,7 @@ func NewRootHandler(version string) http.HandlerFunc {
 		Version: version,
 		Endpoints: []endpoint{
 			{Path: "/health", Description: "Health check and uptime", Auth: false},
+			{Path: "/ready", Description: "Readiness: RediSearch index and aggregation state", Auth: false},
 			{Path: "/metrics", Description: "Prometheus metrics", Auth: false},
 			{Path: "/analytics/summary", Description: "Aggregated event summary", Auth: true},
 			{Path: "/analytics/systems", Description: "Events grouped by system", Auth: true},

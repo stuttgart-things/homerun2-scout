@@ -119,6 +119,9 @@ func main() {
 		handlers.NewHealthHandler(version, commit, date, startTime),
 	))
 
+	// Readiness (no auth): index exists and aggregation succeeded recently (#75)
+	mux.HandleFunc("/ready", middleware.LoggingMiddleware(handlers.NewReadyHandler(agg)))
+
 	// Analytics endpoints (with auth)
 	authWrap := func(h http.HandlerFunc) http.HandlerFunc {
 		return middleware.LoggingMiddleware(middleware.TokenAuthMiddleware(cfg.AuthToken, h))
