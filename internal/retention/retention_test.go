@@ -102,3 +102,13 @@ func TestStreamMinIDFormat(t *testing.T) {
 		t.Errorf("round-trip mismatch: got %v, want %v", roundTrip, cutoff)
 	}
 }
+
+func TestRetentionQueries(t *testing.T) {
+	cutoff := time.Unix(1757671200, 0)
+	if got, want := expiredQuery(cutoff), "@timestamp_unix:[-inf (1757671200]"; got != want {
+		t.Errorf("expiredQuery = %q, want %q", got, want)
+	}
+	if got, want := withoutNumericTimestampQuery(), "-@timestamp_unix:[-inf +inf]"; got != want {
+		t.Errorf("withoutNumericTimestampQuery = %q, want %q", got, want)
+	}
+}
