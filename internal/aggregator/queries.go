@@ -26,6 +26,7 @@ func (a *Aggregator) aggregateSummary(ctx context.Context) *models.Summary {
 
 	result, err := a.client.Do(ctx, args...).Result()
 	if err != nil {
+		a.noteQueryError(err)
 		slog.Warn("failed to aggregate severity counts", "error", err)
 		return summary
 	}
@@ -62,6 +63,7 @@ func (a *Aggregator) aggregateSystems(ctx context.Context) *models.SystemStats {
 
 	result, err := a.client.Do(ctx, args...).Result()
 	if err != nil {
+		a.noteQueryError(err)
 		slog.Warn("failed to aggregate system counts", "error", err)
 		return stats
 	}
@@ -102,6 +104,7 @@ func (a *Aggregator) aggregateAlerts(ctx context.Context) *models.AlertStats {
 
 		result, err := a.client.Do(ctx, args...).Result()
 		if err != nil {
+			a.noteQueryError(err)
 			slog.Warn("failed to aggregate alert counts", "severity", sev, "error", err)
 			continue
 		}
@@ -128,6 +131,7 @@ func (a *Aggregator) aggregateAlerts(ctx context.Context) *models.AlertStats {
 
 	result, err := a.client.Do(ctx, args...).Result()
 	if err != nil {
+		a.noteQueryError(err)
 		slog.Warn("failed to aggregate top alert systems", "error", err)
 		return stats
 	}

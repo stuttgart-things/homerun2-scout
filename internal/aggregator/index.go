@@ -17,8 +17,7 @@ func (a *Aggregator) EnsureIndex(ctx context.Context) error {
 	}
 
 	// If the error is not about a missing index, something else is wrong
-	errMsg := err.Error()
-	if !strings.Contains(errMsg, "no such index") && !strings.Contains(errMsg, "Unknown index name") {
+	if !isMissingIndexError(err) {
 		return err
 	}
 
@@ -46,4 +45,14 @@ func (a *Aggregator) EnsureIndex(ctx context.Context) error {
 
 	slog.Info("redisearch index created", "index", a.index)
 	return nil
+}
+
+// isMissingIndexError reports whether err is RediSearch saying the index does
+// not exist. The wording differs between Redis Stack / RediSearch versions.
+func isMissingIndexError(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := err.Error()
+	return strings.Contains(msg, "no such index") || strings.Contains(msg, "Unknown index name")
 }
