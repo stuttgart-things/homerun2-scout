@@ -262,7 +262,7 @@ Taskfile.yaml              # Task runner
 | `AUTH_TOKEN` | Bearer token for API auth | (empty = no auth) |
 | `LOG_FORMAT` | Log format: `json` or `text` | `json` |
 | `LOG_LEVEL` | Log level: `debug`, `info`, `warn`, `error` | `info` |
-| `ALERT_PITCHER_URL` | omni-pitcher `/pitch` endpoint | (empty) |
+| `ALERT_PITCHER_URL` | omni-pitcher base URL; scout posts to `<url>/pitch` | (empty) |
 | `ALERT_PITCHER_TOKEN` | Bearer token for omni-pitcher | (empty) |
 | `ALERT_ERROR_THRESHOLD` | Error count threshold to trigger alert | `0` |
 | `ALERT_CRITICAL_THRESHOLD` | Critical count threshold to trigger alert | `0` |
