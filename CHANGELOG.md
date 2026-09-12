@@ -1,3 +1,10 @@
+## [0.8.3](https://github.com/stuttgart-things/homerun2-scout/compare/v0.8.2...v0.8.3) (2026-09-12)
+
+
+### Bug Fixes
+
+* re-create the RediSearch index until it exists, and open the HTTP port before the first aggregation ([5b6ac7b](https://github.com/stuttgart-things/homerun2-scout/commit/5b6ac7b86c604e92e0f7c25da63ec4cf432abf9a)), closes [#73](https://github.com/stuttgart-things/homerun2-scout/issues/73)
+
 ## [0.8.2](https://github.com/stuttgart-things/homerun2-scout/compare/v0.8.1...v0.8.2) (2026-05-17)
 
 
