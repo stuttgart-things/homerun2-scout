@@ -39,3 +39,15 @@ type HealthResponse struct {
 	Date    string `json:"date"`
 	Uptime  string `json:"uptime"`
 }
+
+// ReadinessResponse holds the /ready response: whether scout is currently able
+// to aggregate, and why not if it is not.
+type ReadinessResponse struct {
+	Status              string `json:"status"`
+	IndexReady          bool   `json:"indexReady"`
+	LastSuccess         string `json:"lastSuccess,omitempty"`
+	LastError           string `json:"lastError,omitempty"`
+	ConsecutiveFailures int64  `json:"consecutiveFailures"`
+	StaleAfter          string `json:"staleAfter"`
+	Reason              string `json:"reason,omitempty"`
+}
