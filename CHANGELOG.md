@@ -1,3 +1,10 @@
+# [0.11.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.10.0...v0.11.0) (2026-09-12)
+
+
+### Features
+
+* hourly and daily digests pitched through omni-pitcher ([#80](https://github.com/stuttgart-things/homerun2-scout/issues/80)) ([77916d5](https://github.com/stuttgart-things/homerun2-scout/commit/77916d58246ff950b36f803ab49c4ad481d16b70)), closes [#45](https://github.com/stuttgart-things/homerun2-scout/issues/45) [#45](https://github.com/stuttgart-things/homerun2-scout/issues/45)
+
 # [0.10.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.9.1...v0.10.0) (2026-09-12)
 
 
