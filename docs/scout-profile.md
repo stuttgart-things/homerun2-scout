@@ -38,6 +38,7 @@ spec:
 1. At startup, if `SCOUT_PROFILE_NAME` is set, the scout reads the named CR from the pod's namespace via the Kubernetes API
 2. Non-empty fields in the CR **override** the corresponding env var values in config
 3. If the CR is missing, unreachable, or `SCOUT_PROFILE_NAME` is empty, the scout starts normally with env var defaults — no crash
+4. While running, the scout reads the CR again every `SCOUT_INTERVAL`. When it was created, changed or deleted since startup, the scout shuts down gracefully - logging `restarting to apply the ScoutProfile` with the reason - and Kubernetes restarts the container, which applies the new profile. A read that fails for another reason (API server unreachable, RBAC) changes nothing, so a CR applied after the pod started - e.g. in a later Argo CD sync-wave - no longer waits for the next manual restart
 
 ## Apply the CRD
 
