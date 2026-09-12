@@ -1,3 +1,10 @@
+## [0.9.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.9.0...v0.9.1) (2026-09-12)
+
+
+### Bug Fixes
+
+* **alerter:** count error and critical in any letter case ([#77](https://github.com/stuttgart-things/homerun2-scout/issues/77)) ([f29e496](https://github.com/stuttgart-things/homerun2-scout/commit/f29e4962fecf417a292915cc9908fe827bed06bb))
+
 # [0.9.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.8.3...v0.9.0) (2026-09-12)
 
 
