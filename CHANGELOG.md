@@ -1,3 +1,10 @@
+## [0.11.2](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.1...v0.11.2) (2026-09-13)
+
+
+### Bug Fixes
+
+* stamp the build date ([#82](https://github.com/stuttgart-things/homerun2-scout/issues/82)) ([7db4ef1](https://github.com/stuttgart-things/homerun2-scout/commit/7db4ef177b8d178c7dbb04bd45f7a0d575da4745)), closes [#190](https://github.com/stuttgart-things/homerun2-scout/issues/190)
+
 ## [0.11.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.0...v0.11.1) (2026-09-13)
 
 
