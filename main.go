@@ -45,7 +45,9 @@ func main() {
 	// Print banner
 	banner.Print(version, commit, date)
 
-	// Load ScoutProfile CR (if configured) and merge into config
+	// Load ScoutProfile CR (if configured) and merge into config. The profile
+	// read here is the baseline the watch below compares against.
+	var watchProfile func(ctx context.Context, restart chan<- string)
 	if cfg.ScoutProfileName != "" {
 		ctx := context.Background()
 		ns := os.Getenv("POD_NAMESPACE")
@@ -63,6 +65,10 @@ func main() {
 				slog.Warn("ScoutProfile merge error, using env defaults", "error", merr)
 			} else {
 				slog.Info("ScoutProfile applied", "name", cfg.ScoutProfileName, "namespace", ns)
+			}
+			name, interval := cfg.ScoutProfileName, cfg.ScoutInterval
+			watchProfile = func(ctx context.Context, restart chan<- string) {
+				go profile.Watch(ctx, loader, ns, name, p, interval, func(reason string) { restart <- reason })
 			}
 		}
 	}
@@ -164,12 +170,25 @@ func main() {
 		}
 	}()
 
+	// A changed ScoutProfile ends the process the same graceful way as SIGTERM;
+	// Kubernetes restarts the container, which then applies the new profile.
+	restart := make(chan string, 1)
+	watchCtx, stopWatch := context.WithCancel(ctx)
+	defer stopWatch()
+	if watchProfile != nil {
+		watchProfile(watchCtx, restart)
+	}
+
 	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-
-	slog.Info("shutting down...")
+	select {
+	case <-quit:
+		slog.Info("shutting down...")
+	case reason := <-restart:
+		slog.Info("restarting to apply the ScoutProfile", "reason", reason, "name", cfg.ScoutProfileName)
+	}
+	stopWatch()
 
 	// Stop retention cleaner
 	if cleaner != nil {

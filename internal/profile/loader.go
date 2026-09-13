@@ -52,8 +52,8 @@ func NewKubernetesLoader() (*KubernetesLoader, error) {
 	return &KubernetesLoader{client: client}, nil
 }
 
-// Load fetches the named ScoutProfile CR from the given namespace.
-// Returns nil, nil if the resource is not found.
+// Load fetches the named ScoutProfile CR from the given namespace. A missing CR
+// is an error wrapping the API's NotFound (apierrors.IsNotFound).
 func (l *KubernetesLoader) Load(ctx context.Context, namespace, name string) (*ScoutProfile, error) {
 	obj, err := l.client.Resource(scoutProfileGVR).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
