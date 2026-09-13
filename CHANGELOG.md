@@ -1,3 +1,10 @@
+## [0.11.1](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.0...v0.11.1) (2026-09-13)
+
+
+### Bug Fixes
+
+* **profile:** restart when the ScoutProfile changes after startup ([#81](https://github.com/stuttgart-things/homerun2-scout/issues/81)) ([9f743bb](https://github.com/stuttgart-things/homerun2-scout/commit/9f743bb9e449d9ff3f5429198a57d65bc9b664f2))
+
 # [0.11.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.10.0...v0.11.0) (2026-09-12)
 
 
