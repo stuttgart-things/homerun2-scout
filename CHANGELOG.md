@@ -1,3 +1,10 @@
+## [0.11.3](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.2...v0.11.3) (2026-09-13)
+
+
+### Bug Fixes
+
+* **deps:** update module charm.land/lipgloss/v2 to v2.0.6 ([#69](https://github.com/stuttgart-things/homerun2-scout/issues/69)) ([6a816cf](https://github.com/stuttgart-things/homerun2-scout/commit/6a816cf0a0a93b6dfc1b054e3b79e89b298275ac))
+
 ## [0.11.2](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.1...v0.11.2) (2026-09-13)
 
 
