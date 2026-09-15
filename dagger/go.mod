@@ -3,7 +3,7 @@ module dagger/dagger
 go 1.26.0
 
 require (
-	dagger.io/dagger v0.20.8
+	dagger.io/dagger v0.21.9
 	github.com/Khan/genqlient v0.8.1
 	github.com/vektah/gqlparser/v2 v2.5.33
 	go.opentelemetry.io/otel v1.43.0
