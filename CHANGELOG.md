@@ -1,3 +1,10 @@
+## [0.11.5](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.4...v0.11.5) (2026-09-20)
+
+
+### Bug Fixes
+
+* **ci:** baue das PR-Image aus dem Head-Commit ([e52d69d](https://github.com/stuttgart-things/homerun2-scout/commit/e52d69d921820a4740fdbc0f32d5b50bcda5d69a)), closes [#85](https://github.com/stuttgart-things/homerun2-scout/issues/85)
+
 ## [0.11.4](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.3...v0.11.4) (2026-09-20)
 
 
