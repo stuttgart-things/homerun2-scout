@@ -1,3 +1,10 @@
+## [0.11.4](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.3...v0.11.4) (2026-09-20)
+
+
+### Bug Fixes
+
+* **ci:** repariere die PR-Preview-Strecke ([f88473a](https://github.com/stuttgart-things/homerun2-scout/commit/f88473a00f66e73cf04db89e990790ada862b4de)), closes [stuttgart-things/stuttgart-things#3065](https://github.com/stuttgart-things/stuttgart-things/issues/3065) [#83](https://github.com/stuttgart-things/homerun2-scout/issues/83)
+
 ## [0.11.3](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.2...v0.11.3) (2026-09-13)
 
 
