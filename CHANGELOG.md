@@ -1,3 +1,10 @@
+## [0.11.6](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.5...v0.11.6) (2026-09-21)
+
+
+### Bug Fixes
+
+* **ci:** nimm die Preview-Domain aus der Org-Variable ([0893a14](https://github.com/stuttgart-things/homerun2-scout/commit/0893a14da9de88c59fc2009ead1c90fee1966d79)), closes [#87](https://github.com/stuttgart-things/homerun2-scout/issues/87)
+
 ## [0.11.5](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.4...v0.11.5) (2026-09-20)
 
 
