@@ -14,7 +14,8 @@ A Go microservice that periodically analyzes messages indexed in RediSearch and 
 | `/analytics/summary` | `GET` | Bearer token | Severity counts, total messages |
 | `/analytics/systems` | `GET` | Bearer token | Per-system message counts (top 20) |
 | `/analytics/alerts` | `GET` | Bearer token | Alert frequency, top alerting systems |
-| `/analytics/digest` | `GET` | Bearer token | Digest of the window ending now (`?schedule=hourly\|daily`), as it would be pitched; not pitched |
+| `/analytics/digest` | `GET` | Bearer token | Digest of the window ending now (`?schedule=hourly\|daily\|weekly`), as it would be pitched; not pitched |
+| `/analytics/messages` | `GET` | Bearer token | Messages of the window ending now (`?schedule=`, `systems=`, `severity=`, `tags=`, `limit=`, `fields=message`), e.g. for homerun2-ai-pitcher ([API usage](docs/api-usage.md#messages)) |
 | `/metrics` | `GET` | None | Prometheus metrics ([Grafana integration](https://stuttgart-things.github.io/homerun2-scout/grafana/)) |
 
 <details>
@@ -265,7 +266,7 @@ Taskfile.yaml              # Task runner
 | `REDISEARCH_INDEX` | RediSearch index name; created when missing, re-created if it disappears | `messages` |
 | `SCOUT_INTERVAL` | Aggregation interval (Go duration) | `60s` |
 | `SCOUT_PROFILE_NAME` | ScoutProfile CR name to load at startup | (empty) |
-| `SCOUT_RETENTION_TTL` | Retention TTL — prunes expired JSON documents and trims the Redis Stream via `XTRIM MINID` | `48h` |
+| `SCOUT_RETENTION_TTL` | Retention TTL — prunes expired JSON documents and trims the Redis Stream via `XTRIM MINID`. `schedule=weekly` needs at least `192h` (8 days), else the answer carries `windowIncomplete: true` | `48h` |
 | `SCOUT_RETENTION_ENABLED` | Enable/disable retention cleaner | `true` |
 | `AUTH_TOKEN` | Bearer token for API auth | (empty = no auth) |
 | `LOG_FORMAT` | Log format: `json` or `text` | `json` |

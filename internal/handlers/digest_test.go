@@ -30,7 +30,8 @@ func TestDigestHandler(t *testing.T) {
 		{"", "daily", http.StatusOK},
 		{"?schedule=daily", "daily", http.StatusOK},
 		{"?schedule=hourly", "hourly", http.StatusOK},
-		{"?schedule=weekly", "", http.StatusBadRequest},
+		{"?schedule=weekly", "weekly", http.StatusOK},
+		{"?schedule=monthly", "", http.StatusBadRequest},
 	}
 	for _, tc := range cases {
 		t.Run(tc.query, func(t *testing.T) {
