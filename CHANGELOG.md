@@ -1,3 +1,10 @@
+# [0.12.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.6...v0.12.0) (2026-10-15)
+
+
+### Features
+
+* /analytics/messages and a weekly window ([23df6d3](https://github.com/stuttgart-things/homerun2-scout/commit/23df6d3b023f15a47bd54825e12737620c6cf7fc)), closes [#90](https://github.com/stuttgart-things/homerun2-scout/issues/90)
+
 ## [0.11.6](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.5...v0.11.6) (2026-09-21)
 
 
