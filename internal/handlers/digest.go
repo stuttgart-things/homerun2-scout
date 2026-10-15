@@ -12,7 +12,7 @@ type DigestPreviewer interface {
 	Preview(ctx context.Context, s digest.Schedule) (digest.Report, error)
 }
 
-// NewDigestHandler returns a handler for GET /analytics/digest?schedule=hourly|daily:
+// NewDigestHandler returns a handler for GET /analytics/digest?schedule=hourly|daily|weekly:
 // the digest of the window ending now, as it would be pitched. It works whether
 // or not the periodic digest is enabled.
 func NewDigestHandler(previewer DigestPreviewer) http.HandlerFunc {
@@ -22,14 +22,8 @@ func NewDigestHandler(previewer DigestPreviewer) http.HandlerFunc {
 			return
 		}
 
-		var schedule digest.Schedule
-		switch name := r.URL.Query().Get("schedule"); name {
-		case "", "daily":
-			schedule, _ = digest.Daily("00:00")
-		case "hourly":
-			schedule = digest.Hourly()
-		default:
-			respondJSON(w, http.StatusBadRequest, map[string]string{"error": "schedule must be hourly or daily, not " + name})
+		schedule, ok := previewSchedule(w, r)
+		if !ok {
 			return
 		}
 
@@ -40,4 +34,23 @@ func NewDigestHandler(previewer DigestPreviewer) http.HandlerFunc {
 		}
 		respondJSON(w, http.StatusOK, report)
 	}
+}
+
+// previewSchedule returns the schedule named by ?schedule= (default daily)
+// for a window ending now, or answers 400 and returns false. The time of day
+// does not matter: the window ends now.
+func previewSchedule(w http.ResponseWriter, r *http.Request) (digest.Schedule, bool) {
+	var schedule digest.Schedule
+	switch name := r.URL.Query().Get("schedule"); name {
+	case "", "daily":
+		schedule, _ = digest.Daily("00:00")
+	case "hourly":
+		schedule = digest.Hourly()
+	case "weekly":
+		schedule, _ = digest.Weekly("00:00")
+	default:
+		respondJSON(w, http.StatusBadRequest, map[string]string{"error": "schedule must be hourly, daily or weekly, not " + name})
+		return digest.Schedule{}, false
+	}
+	return schedule, true
 }

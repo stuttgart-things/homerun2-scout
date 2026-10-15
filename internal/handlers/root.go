@@ -27,7 +27,8 @@ func NewRootHandler(version string) http.HandlerFunc {
 			{Path: "/analytics/summary", Description: "Aggregated event summary", Auth: true},
 			{Path: "/analytics/systems", Description: "Events grouped by system", Auth: true},
 			{Path: "/analytics/alerts", Description: "Alert counts and top systems", Auth: true},
-			{Path: "/analytics/digest", Description: "Digest of the window ending now (?schedule=hourly|daily), not pitched", Auth: true},
+			{Path: "/analytics/digest", Description: "Digest of the window ending now (?schedule=hourly|daily|weekly), not pitched", Auth: true},
+			{Path: "/analytics/messages", Description: "Messages of the window ending now (?schedule=, systems=, severity=, tags=, limit=, fields=message)", Auth: true},
 		},
 	}
 

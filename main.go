@@ -152,6 +152,7 @@ func main() {
 	mux.HandleFunc("/analytics/systems", authWrap(handlers.NewSystemsHandler(agg)))
 	mux.HandleFunc("/analytics/alerts", authWrap(handlers.NewAlertsHandler(agg)))
 	mux.HandleFunc("/analytics/digest", authWrap(handlers.NewDigestHandler(digestRunner)))
+	mux.HandleFunc("/analytics/messages", authWrap(handlers.NewMessagesHandler(digestRunner)))
 
 	// Prometheus metrics endpoint (no auth)
 	mux.Handle("/metrics", promhttp.Handler())

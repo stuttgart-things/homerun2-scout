@@ -14,14 +14,21 @@ import (
 )
 
 type fakeQuerier struct {
-	rows  []Row
-	err   error
-	calls [][2]time.Time
+	rows      []Row
+	entries   []Entry
+	truncated bool
+	err       error
+	calls     [][2]time.Time
 }
 
 func (q *fakeQuerier) Window(_ context.Context, start, end time.Time) ([]Row, error) {
 	q.calls = append(q.calls, [2]time.Time{start, end})
 	return q.rows, q.err
+}
+
+func (q *fakeQuerier) Messages(_ context.Context, start, end time.Time, _ int) ([]Entry, bool, error) {
+	q.calls = append(q.calls, [2]time.Time{start, end})
+	return q.entries, q.truncated, q.err
 }
 
 // fakeStore is shared by several runners the way Redis is shared by replicas.

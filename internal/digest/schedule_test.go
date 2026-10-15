@@ -83,3 +83,30 @@ func TestDaily(t *testing.T) {
 		t.Error("unexpected lateness")
 	}
 }
+
+func TestWeekly(t *testing.T) {
+	loc := berlin(t)
+	weekly, err := Weekly("07:00")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if weekly.Name != "weekly" || weekly.Label != "7d" {
+		t.Errorf("weekly = %+v", weekly)
+	}
+	// Across the end of daylight saving time (2026-10-25): seven calendar
+	// days, 169 hours.
+	end := time.Date(2026, 10, 28, 7, 0, 0, 0, loc)
+	start := weekly.Start(end)
+	if want := time.Date(2026, 10, 21, 7, 0, 0, 0, loc); !start.Equal(want) {
+		t.Errorf("start = %v, want %v", start, want)
+	}
+	if got := end.Sub(start); got != 169*time.Hour {
+		t.Errorf("window = %v, want 169h", got)
+	}
+	if got := weekly.LastEnd(time.Date(2026, 10, 28, 6, 59, 0, 0, loc), loc); !got.Equal(time.Date(2026, 10, 27, 7, 0, 0, 0, loc)) {
+		t.Errorf("last end = %v", got)
+	}
+	if _, err := Weekly("7"); err == nil {
+		t.Error("Weekly(\"7\") accepted")
+	}
+}

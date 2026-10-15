@@ -20,9 +20,13 @@ import (
 // any window is still pitched, so a restarted scout finds it.
 const claimTTL = 8 * 24 * time.Hour
 
-// Querier returns the groups of messages in [start, end).
+// Querier reads the messages of a time window.
 type Querier interface {
+	// Window returns the groups of messages in [start, end).
 	Window(ctx context.Context, start, end time.Time) ([]Row, error)
+	// Messages returns the messages in [start, end), newest first, at most
+	// max of them; truncated reports that the window held more.
+	Messages(ctx context.Context, start, end time.Time, max int) (entries []Entry, truncated bool, err error)
 }
 
 // Store claims a window's digest, so it is pitched once however many scout
@@ -158,6 +162,9 @@ type Report struct {
 	Message  Message  `json:"message"`
 	Current  Summary  `json:"current"`
 	Previous *Summary `json:"previous,omitempty"`
+	// WindowIncomplete reports that retention has already deleted the oldest
+	// part of the current window, so its counts are too low.
+	WindowIncomplete bool `json:"windowIncomplete,omitempty"`
 }
 
 // Build computes the digest of s for the window ending at end.
@@ -183,7 +190,16 @@ func (r *Runner) Build(ctx context.Context, s Schedule, end time.Time) (Message,
 	}
 
 	msg := Format(s, cur, previous, r.cfg.System, r.cfg.Location)
-	return msg, Report{Schedule: s.Name, Message: msg, Current: cur, Previous: previous}, nil
+	return msg, Report{
+		Schedule: s.Name, Message: msg, Current: cur, Previous: previous,
+		WindowIncomplete: r.beyondRetention(start),
+	}, nil
+}
+
+// beyondRetention reports whether retention may already have deleted messages
+// from start on.
+func (r *Runner) beyondRetention(start time.Time) bool {
+	return r.cfg.Retention > 0 && start.Before(r.now().Add(-r.cfg.Retention))
 }
 
 // Preview builds the digest of s for the window ending now, without pitching
