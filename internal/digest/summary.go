@@ -49,7 +49,7 @@ func Summarize(rows []Row, start, end time.Time, exclude []string, top int) Summ
 	systems := map[string]*SystemCount{}
 
 	for _, r := range rows {
-		if r.System == "" || slices.Contains(exclude, r.System) {
+		if r.System == "" || Excluded(r.System, exclude) {
 			continue
 		}
 		severity := strings.ToLower(r.Severity)

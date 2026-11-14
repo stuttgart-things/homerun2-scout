@@ -280,7 +280,7 @@ Taskfile.yaml              # Task runner
 | `DIGEST_HOURLY` | A digest of every full hour | `false` |
 | `DIGEST_DAILY_AT` | A digest of the last day at this local time (`HH:MM`) | (empty) |
 | `DIGEST_TIMEZONE` | IANA timezone the windows end in | `UTC` |
-| `DIGEST_EXCLUDE_SYSTEMS` | Comma-separated systems left out of the counts | (empty) |
+| `DIGEST_EXCLUDE_SYSTEMS` | Comma-separated systems left out of the counts; a trailing `*` matches a prefix (`vm-*,k8sgpt-*`) | (empty) |
 | `DIGEST_TOP_SYSTEMS` | Systems listed in a digest | `3` |
 | `DIGEST_SYSTEM` | System a digest is pitched as (always excluded from the counts) | `scout-digest` |
 
