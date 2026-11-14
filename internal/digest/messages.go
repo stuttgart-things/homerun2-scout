@@ -111,7 +111,7 @@ func SelectMessages(entries []Entry, f MessageFilter, exclude []string) ([]Entry
 }
 
 func matches(e Entry, f MessageFilter, exclude []string) bool {
-	if e.System == "" || slices.Contains(exclude, e.System) {
+	if e.System == "" || Excluded(e.System, exclude) {
 		return false
 	}
 	if len(f.Systems) > 0 && !slices.Contains(f.Systems, e.System) {

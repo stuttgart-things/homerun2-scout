@@ -124,7 +124,7 @@ Response (example):
 
 ## Messages
 
-The messages of the window ending now, for consumers that need more than counts - homerun2-ai-pitcher's summaries of PRs, releases and outages (#90). The window is the same as `/analytics/digest`'s, and the digest's exclusions apply: the digest's own system and `DIGEST_EXCLUDE_SYSTEMS` never show up.
+The messages of the window ending now, for consumers that need more than counts - homerun2-ai-pitcher's summaries of PRs, releases and outages (#90). The window is the same as `/analytics/digest`'s, and the digest's exclusions apply: the digest's own system and `DIGEST_EXCLUDE_SYSTEMS` (exact names, or prefixes ending in `*`) never show up.
 
 | Parameter | Meaning |
 |---|---|
