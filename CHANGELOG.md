@@ -1,3 +1,10 @@
+# [0.13.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.12.0...v0.13.0) (2026-11-14)
+
+
+### Features
+
+* **digest:** prefix match in DIGEST_EXCLUDE_SYSTEMS ([#94](https://github.com/stuttgart-things/homerun2-scout/issues/94)) ([ed468ac](https://github.com/stuttgart-things/homerun2-scout/commit/ed468ac86f3c277b747216bac8cfeedfdef693fc)), closes [#93](https://github.com/stuttgart-things/homerun2-scout/issues/93)
+
 # [0.12.0](https://github.com/stuttgart-things/homerun2-scout/compare/v0.11.6...v0.12.0) (2026-10-15)
 
 
