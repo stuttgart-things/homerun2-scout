@@ -3,7 +3,7 @@ module github.com/stuttgart-things/homerun2-scout
 go 1.26.0
 
 require (
-	charm.land/lipgloss/v2 v2.0.6
+	charm.land/lipgloss/v2 v2.1.1
 	github.com/prometheus/client_golang v1.23.2
 	github.com/redis/go-redis/v9 v9.19.0
 	k8s.io/apimachinery v0.36.1
